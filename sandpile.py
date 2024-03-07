@@ -29,6 +29,16 @@ def set_bound_0(grid: np.ndarray, N: int, boundary: str='open', d: int=2) -> np.
             slices[axis] = N-1
             grid[tuple(slices)] = 0
     return grid
+
+def generate_unit_vecs(d:int) -> list:
+    empty = np.zeros(d, dtype=int)
+
+    vectors = []
+    for i in range(d):
+        vec = copy.copy(empty)
+        vec[i] = 1
+        vectors.append(vec)
+    return vectors
            
 def set_up_grid(N: int, d: int=2) -> np.ndarray:
     """Generates flat grid 
@@ -43,7 +53,7 @@ def set_up_grid(N: int, d: int=2) -> np.ndarray:
     shape = tuple([N] * d)
     return np.zeros(shape=shape)
 
-def pertubation_mech(grid: np.ndarray, N: int, point: str = 'random', type: str = 'conservative', boundary_condition: str = 'open', px=None, py=None) -> np.ndarray:  
+def pertubation_mech(grid: np.ndarray, N: int, p: np.ndarray, d:int=2, type: str = 'conservative', boundary_condition: str = 'open') -> np.ndarray:  
     """applies a pertubation to a specific point in the grid
 
     Args:
@@ -57,24 +67,29 @@ def pertubation_mech(grid: np.ndarray, N: int, point: str = 'random', type: str 
     Returns:
         np.ndarray: grid with the perturbation applied
     """
-    if px == None:
-        px = np.random.randint(1, N)
-    if py == None:
-        py = np.random.randint(1, N)
+    
+    p[p==False] = np.random.randint(1,N)
+    #if px == None:
+    #    px = np.random.randint(1, N)
+    #if py == None:
+    #    py = np.random.randint(1, N)
     
     
     if type == 'conservative':
-        grid[px,py] += 2 
-        grid[px - 1, py] -= 1
-        grid[px, py - 1] -= 1
+        grid[tuple(p)] += d 
+        vecs = generate_unit_vecs(d)
+        for i in range(d):
+            grid[tuple(p-vecs[i])] -= 1
+        #grid[px, py - 1] -= 1
+        
         
     if type == 'non_conservative':
-        grid[px,py] += 1    
+        grid[tuple(p)] += 1    
     
-    grid = set_bound_0(grid, N, boundary_condition)
+    grid = set_bound_0(grid, N, boundary_condition, d=d)
     return grid
 
-def relax(grid, N, crit_val, boundary_condition='open', use_abs_val=False) -> np.ndarray:   
+def relax(grid, N, crit_val, boundary_condition='open', use_abs_val=False, d:int=2) -> np.ndarray:   
     """relaxation applied to the grid (only one time)
 
     Args:
@@ -87,51 +102,72 @@ def relax(grid, N, crit_val, boundary_condition='open', use_abs_val=False) -> np
     Returns:
         np.ndarray: relaxed grid
     """
-    grid = set_bound_0(grid, N, boundary_condition)
+    grid = set_bound_0(grid, N, boundary_condition, d)
     
     if use_abs_val:
         mask = np.where(abs(grid) > crit_val)
     else:
         mask = np.where(grid > crit_val)
-        
-
+    
     for i in range(len(mask[0])):   
-        xi = mask[0][i]  
-        yi = mask[1][i]
+        vecs = generate_unit_vecs(d)
+        p = np.array(mask)[:, i]
+        
+        
+        
+        #xi = mask[0][i]  
+        #yi = mask[1][i]
+        
         if use_abs_val:
-            if grid[xi, yi] > 0:
-                grid[xi, yi] += -2*2 + sum([1 if mask[j][i] == N-1 else 0 for j in range(0,2)])
-                if xi < N-1:
-                    grid[xi+1, yi] += 1
-                if yi < N-1:
-                    grid[xi, yi+1] += 1
-                grid[xi-1, yi] += 1
-                grid[xi, yi-1] += 1
+            if grid[tuple(p)] > 0:
+                grid[tuple(p)] += -2*d + sum([1 if mask[j][i] == N-1 else 0 for j in range(0,d)])
                 
+                for j in range(d):
                     
-            elif grid[xi, yi] < 0:
-                grid[xi, yi] += 2*2 - sum([1 if mask[j][i] == N-1 else 0 for j in range(0,2)])
-                if xi < N-1:
-                    grid[xi+1, yi] -= 1
-                if yi < N-1:
-                    grid[xi, yi+1] -= 1
-                grid[xi-1, yi] -= 1
-                grid[xi, yi-1] -= 1
+                    if p[j] < N-1:
+                        grid[tuple(p + vecs[j])] += 1
+                    grid[tuple(p - vecs[j])] += 1
+                
+               # if xi < N-1:
+               #     grid[xi+1, yi] += 1
+               # if yi < N-1:
+               #     grid[xi, yi+1] += 1
+                    
+                    
+               # grid[xi-1, yi] += 1
+               # grid[xi, yi-1] += 1
+                
+            elif grid[tuple(p)] < 0:
+                grid[tuple(p)] += 2*d - sum([1 if mask[j][i] == N-1 else 0 for j in range(0,d)])
+                
+                for j in range(d):
+                    if p[j] < N-1:
+                        grid[tuple(p + vecs[j])] -= 1
+                    grid[tuple(p - vecs[j])] -= 1     
+                      
+           # elif grid[xi, yi] < 0:
+           #     grid[xi, yi] += 2*2 - sum([1 if mask[j][i] == N-1 else 0 for j in range(0,d)])
+           #     if xi < N-1:
+           #         grid[xi+1, yi] -= 1
+           #     if yi < N-1:
+           #         grid[xi, yi+1] -= 1
+           #     grid[xi-1, yi] -= 1
+           #     grid[xi, yi-1] -= 1
                 
                 
         else:
-            grid[xi, yi] += -2*2 + sum([1 if mask[j][i] == N-1 else 0 for j in range(0,2)])
-            if xi < N-1:
-                grid[xi+1, yi] += 1
-            if yi < N-1:
-                grid[xi, yi+1] += 1
-            grid[xi-1, yi] += 1
-            grid[xi, yi-1] += 1           
+            if grid[tuple(p)] > 0:
+                grid[tuple(p)] += -2*d + sum([1 if mask[j][i] == N-1 else 0 for j in range(0,d)])
+                
+                for j in range(d):
+                    if p[j] < N-1:
+                        grid[tuple(p + vecs[j])] += 1
+                    grid[tuple(p - vecs[j])] += 1         
     
-    grid = set_bound_0(grid, N, boundary_condition)
+    grid = set_bound_0(grid, N, boundary_condition, d)
     return grid
 
-def spatial_linear_distance(crit_grid, px, py) -> float:
+def spatial_linear_distance(crit_grid, p:tuple, d:int=2) -> float:
     """_summary_
 
     Args:
@@ -145,25 +181,27 @@ def spatial_linear_distance(crit_grid, px, py) -> float:
     truth = np.where(crit_grid >= 1)
     
     dist = []
-    for posx, posy in zip(truth[0], truth[1]):
-        dist.append(np.sqrt((px-posx)**2 + (py-posy)**2))
+    for i in range(len(truth[0])):
+        pos = np.array(truth)[:, i]
+        dist.append(np.sqrt(np.dot(p-pos, p-pos)))
     return np.max(dist)
 
 ## data frame to store results in
 df_results = pd.DataFrame(columns = ["number", "lifetime", "total dissipation", "spatial linear size"])
 
 ## input values
-N = 100
+N = 10
 crit_val = 3
 t_max = 2e6
+d=3
 
 ## settings for the algorithm
 use_abs_value = True
 type = 'non_conservative'
 boundary_condition = 'closed'
 
-grid = set_up_grid(N=N)         ## set up grid
-pert_grid = set_up_grid(N)      ## array that shows where the grid was perturbed during the entire run
+grid = set_up_grid(N=N, d=d)         ## set up grid
+pert_grid = set_up_grid(N, d)      ## array that shows where the grid was perturbed during the entire run
 
 means = []              ## list where the mean z value of the grid at each point is stored
 t_avalanche = []        ## list where the lifetimes of the avalanches are stored
@@ -175,16 +213,17 @@ n = 0                   ## current number of avalanches
 
 pbar = tqdm(total = t_max, desc ="Running Simulation")
 
-crit_grid_sum = set_up_grid(N)
+crit_grid_sum = set_up_grid(N, d)
 
 while t < t_max:
     ## choose point where the perturbation occurs    
-    px = np.random.randint(1, N)
-    py = np.random.randint(1, N)
+    #px = np.random.randint(1, N)
+    #py = np.random.randint(1, N)
+    p = np.random.randint(1,N, d)
     
-    pert_grid[px, py] +=1
+    pert_grid[tuple(p)] +=1
     
-    grid = pertubation_mech(grid, N, type=type, px=px, py=py, point='given', boundary_condition = boundary_condition)
+    grid = pertubation_mech(grid, N, type=type, p=p, d=d, boundary_condition = boundary_condition)
     
     if use_abs_value:
         z = abs(grid) > crit_val
@@ -192,13 +231,13 @@ while t < t_max:
         z = grid > crit_val
     
     t_pre = t
-    crit_grid = set_up_grid(N)  ## grid that shows all points for which z > z_crit during one avalanche
+    crit_grid = set_up_grid(N, d)  ## grid that shows all points for which z > z_crit during one avalanche
     while np.any(z):
         
         crit_grid[z] += 1   ## increase all points where z > z_crit in an empty grid / the previous grid
         
         
-        grid = relax(grid, N, crit_val, boundary_condition = boundary_condition, use_abs_val=use_abs_value)  ## relax the grid
+        grid = relax(grid, N, crit_val, boundary_condition = boundary_condition, use_abs_val=use_abs_value, d=d)  ## relax the grid
         
         if use_abs_value:
             z = abs(grid) > crit_val
@@ -216,12 +255,12 @@ while t < t_max:
     
 
     
-    if t_post - t_pre != 0:    ## if avalanche occurs, then this is valid
+    if t_post - t_pre != 0:     ## if avalanche occurs, then this is valid
         t_avalanche.append(t_post - t_pre)          ## lifetime of the avalanche
         n +=1                                       ## update number of avalanche
         n_avalanche.append(n)
         total_dissipation.append(np.sum(crit_grid))
-        distance.append(spatial_linear_distance(crit_grid, px, py))
+        distance.append(spatial_linear_distance(crit_grid, p=p, d=d))
   
     ## plot heatmaps of the crit_grid of avalanches with lifetimes larger than some value  
     #if t_post - t_pre > 40:  
@@ -237,9 +276,9 @@ while t < t_max:
 
 pbar.close()
 
-sns.heatmap(crit_grid_sum, norm=LogNorm())
-plt.text(95, 5, f'perturbation = {type} \n boundary = {boundary_condition} ', ha='right', va='top', color='white')
-plt.show()
+#sns.heatmap(crit_grid_sum, norm=LogNorm())
+#plt.text(95, 5, f'perturbation = {type} \n boundary = {boundary_condition} ', ha='right', va='top', color='white')
+#plt.show()
 
 ## write results into data frame
 df_results["lifetime"] = t_avalanche
@@ -247,7 +286,7 @@ df_results["number"] = n_avalanche
 df_results['total dissipation'] = total_dissipation
 df_results["spatial linear size"] = distance
 
-df_results.to_csv(f'results_{type}_{boundary_condition}.csv', index=False, sep=';')
+df_results.to_csv(f'results_{type}_{boundary_condition}_{d}.csv', index=False, sep=';')
 
 print(df_results)
 
