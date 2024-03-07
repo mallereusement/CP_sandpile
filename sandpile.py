@@ -5,7 +5,7 @@ import seaborn as sns
 import copy
 from tqdm import tqdm
 
-def set_bound_0(grid, N, boundary='open', d: int=2):
+def set_bound_0(grid: np.ndarray, N: int, boundary: str='open', d: int=2) -> np.ndarray:
     """set all borders to 0
 
     Args:
@@ -42,7 +42,7 @@ def set_up_grid(N: int, d: int=2) -> np.ndarray:
     shape = tuple([N] * d)
     return np.zeros(shape=shape)
 
-def pertubation_mech(grid, N, point = 'random', type = 'conservative', boundary_condition = 'open', px=None, py=None):  ### ? wenn px und py übergeben werden, wird in der zweiten if-abfrage einfach die punkte von hier übergeben. Brauchen wir dann noch das point = 'random'? wir können da auch nach in px/py = None fragen? vielleicht zwei if-abfragen, dann kann man auch z.b. ein festes x eingeben und dann random y
+def pertubation_mech(grid: np.ndarray, N: int, point: str = 'random', type: str = 'conservative', boundary_condition: str = 'open', px=None, py=None) -> np.ndarray:  ### ? wenn px und py übergeben werden, wird in der zweiten if-abfrage einfach die punkte von hier übergeben. Brauchen wir dann noch das point = 'random'? wir können da auch nach in px/py = None fragen? vielleicht zwei if-abfragen, dann kann man auch z.b. ein festes x eingeben und dann random y
     """applies a pertubation to a specific point in the grid
 
     Args:
@@ -70,7 +70,7 @@ def pertubation_mech(grid, N, point = 'random', type = 'conservative', boundary_
     grid = set_bound_0(grid, N, boundary_condition)
     return grid
 
-def relax(grid, N, crit_val, boundary_condition='open', use_abs_val=False):   
+def relax(grid, N, crit_val, boundary_condition='open', use_abs_val=False) -> np.ndarray:   
     """relaxation applied to the grid (only one time)
 
     Args:
@@ -129,7 +129,7 @@ def relax(grid, N, crit_val, boundary_condition='open', use_abs_val=False):
     grid = set_bound_0(grid, N, boundary_condition)
     return grid
 
-def spatial_linear_distance(crit_grid, px, py):
+def spatial_linear_distance(crit_grid, px, py) -> float:
     """_summary_
 
     Args:
@@ -138,7 +138,7 @@ def spatial_linear_distance(crit_grid, px, py):
         py (_type_): _description_
 
     Returns:
-        _type_: _description_
+        float: _description_
     """
     truth = np.where(crit_grid >= 1)
     
