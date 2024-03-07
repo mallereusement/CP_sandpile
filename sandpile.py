@@ -193,7 +193,7 @@ while t < t_max:
         distance.append(spatial_linear_distance(crit_grid, px, py))
   
     ## plot heatmaps of the crit_grid of avalanches with lifetimes larger than some value  
-    #if t_post - t_pre > 4:  
+    ##if t_post - t_pre > 4:  
     #    sns.heatmap(crit_grid)
     #    plt.text(95, 5, f'$\\tau$ = {t_post - t_pre} \n $f_{{tot}}$ = {np.sum(crit_grid)} \n $s$ = {spatial_linear_distance(crit_grid, px, py):.2f}', ha='right', va='top', color='white')
     #    plt.show()
