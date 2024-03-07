@@ -8,12 +8,12 @@ def set_bound_0(grid, N, boundary='open'):
     """set all borders to 0
 
     Args:
-        grid (_type_): current grid
-        N (_type_): number of rows/columns of the grid
+        grid (np.ndarray): current grid
+        N (int): number of rows/columns of the grid
         boundary (str, optional): type of boundary condition used, takes 'open' and 'closed'. Defaults to 'open'.
 
     Returns:
-        _type_: grid with the boundary condition applied (with borders set to 0)
+        np.ndarray: grid with the boundary condition applied (with borders set to 0)
     """
     grid[0,:] = 0
     grid[:,0] = 0
@@ -26,7 +26,7 @@ def set_up_grid(N):
     """Sets up the grid
 
     Args:
-        N (_type_): number of rows/colums
+        N (int): number of rows/colums
     """
     
     return np.zeros(shape=(N,N))
@@ -35,14 +35,14 @@ def pertubation_mech(grid, N, point = 'random', type = 'conservative', boundary_
     """applies a pertubation to a specific point in the grid
 
     Args:
-        grid (_type_): current grid
-        N (_type_): number of rows/columns of the grid
+        grid (np.ndarray): current grid
+        N (int): number of rows/columns of the grid
         point (str, optional): way to define the point where the perturbation is applied. Defaults to 'random'.
         type (str, optional): type of perturbation, takes 'conservative' or 'non_conservative'. Defaults to 'conservative'.
         boundary_condition (str, optional): type of boundary condition used, takes 'open' and 'closed'. Defaults to 'open'.
 
     Returns:
-        _type_: grid with the perturbation applied
+        np.ndarray: grid with the perturbation applied
     """
     if point == 'random':
         px = np.random.randint(1, N)
@@ -63,14 +63,14 @@ def relax(grid, N, crit_val, boundary_condition='open', use_abs_val=False):
     """relaxation applied to the grid
 
     Args:
-        grid (_type_): current grid
-        N (_type_): number of rows/columns of the grid
-        crit_val (_type_): value of the critical slope
+        grid (np.ndarray): current grid
+        N (int): number of rows/columns of the grid
+        crit_val (int): value of the critical slope
         boundary_condition (str, optional): type of boundary condition used, takes 'open' and 'closed'. Defaults to 'open'.
         use_abs_val (bool, optional): Determines wether the condition |z| > z_crit or z > z_crit is used. Defaults to False. (for the latter case)
 
     Returns:
-        _type_: _description_
+        np.ndarray: relaxed grid
     """
     grid = set_bound_0(grid, N, boundary_condition)
     
@@ -119,6 +119,16 @@ def relax(grid, N, crit_val, boundary_condition='open', use_abs_val=False):
     return grid
 
 def spatial_linear_distance(crit_grid, px, py):
+    """_summary_
+
+    Args:
+        crit_grid (_type_): _description_
+        px (_type_): _description_
+        py (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
     truth = np.where(crit_grid >= 1)
     
     dist = []
