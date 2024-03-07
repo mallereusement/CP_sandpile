@@ -12,6 +12,7 @@ def set_bound_0(grid, N, boundary='open', d: int=2):
         grid (np.ndarray): current grid
         N (int): number of rows/columns of the grid
         boundary (str, optional): type of boundary condition used, takes 'open' and 'closed'. Defaults to 'open'.
+        d (int, optional): Dimension of Grid. Defaults to 2.
 
     Returns:
         np.ndarray: grid with the boundary condition applied (with borders set to 0)
