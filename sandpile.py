@@ -4,6 +4,7 @@ import pandas as pd
 import seaborn as sns
 import copy
 from tqdm import tqdm
+from matplotlib.colors import LogNorm
 
 def set_bound_0(grid: np.ndarray, N: int, boundary: str='open', d: int=2) -> np.ndarray:
     """set all borders to 0
@@ -42,29 +43,32 @@ def set_up_grid(N: int, d: int=2) -> np.ndarray:
     shape = tuple([N] * d)
     return np.zeros(shape=shape)
 
-def pertubation_mech(grid: np.ndarray, N: int, point: str = 'random', type: str = 'conservative', boundary_condition: str = 'open', px=None, py=None) -> np.ndarray:  ### ? wenn px und py übergeben werden, wird in der zweiten if-abfrage einfach die punkte von hier übergeben. Brauchen wir dann noch das point = 'random'? wir können da auch nach in px/py = None fragen? vielleicht zwei if-abfragen, dann kann man auch z.b. ein festes x eingeben und dann random y
+def pertubation_mech(grid: np.ndarray, N: int, point: str = 'random', type: str = 'conservative', boundary_condition: str = 'open', px=None, py=None) -> np.ndarray:  
     """applies a pertubation to a specific point in the grid
 
     Args:
         grid (np.ndarray): current grid
         N (int): number of rows/columns of the grid
-        point (str, optional): way to define the point where the perturbation is applied. Defaults to 'random'.
         type (str, optional): type of perturbation, takes 'conservative' or 'non_conservative'. Defaults to 'conservative'.
         boundary_condition (str, optional): type of boundary condition used, takes 'open' and 'closed'. Defaults to 'open'.
+        px: x-position of the perturbation
+        py: y-position of the perturbation
 
     Returns:
         np.ndarray: grid with the perturbation applied
     """
-    if point == 'random':
+    if px == None:
         px = np.random.randint(1, N)
+    if py == None:
         py = np.random.randint(1, N)
+    
     
     if type == 'conservative':
         grid[px,py] += 2 
         grid[px - 1, py] -= 1
         grid[px, py - 1] -= 1
         
-    if type == 'non conservative':
+    if type == 'non_conservative':
         grid[px,py] += 1    
     
     grid = set_bound_0(grid, N, boundary_condition)
@@ -91,7 +95,7 @@ def relax(grid, N, crit_val, boundary_condition='open', use_abs_val=False) -> np
         mask = np.where(grid > crit_val)
         
 
-    for i in range(len(mask[0])):   ### ich hab alle mask[0/1][i] zu xi/yi geändert wegen übersichtlichkeit
+    for i in range(len(mask[0])):   
         xi = mask[0][i]  
         yi = mask[1][i]
         if use_abs_val:
@@ -123,8 +127,6 @@ def relax(grid, N, crit_val, boundary_condition='open', use_abs_val=False) -> np
                 grid[xi, yi+1] += 1
             grid[xi-1, yi] += 1
             grid[xi, yi-1] += 1           
-            
-
     
     grid = set_bound_0(grid, N, boundary_condition)
     return grid
@@ -153,11 +155,11 @@ df_results = pd.DataFrame(columns = ["number", "lifetime", "total dissipation", 
 ## input values
 N = 100
 crit_val = 3
-t_max = 2e5
+t_max = 2e6
 
 ## settings for the algorithm
 use_abs_value = True
-type = 'non conservative'
+type = 'non_conservative'
 boundary_condition = 'closed'
 
 grid = set_up_grid(N=N)         ## set up grid
@@ -172,6 +174,8 @@ t = 0                   ## time steps
 n = 0                   ## current number of avalanches
 
 pbar = tqdm(total = t_max, desc ="Running Simulation")
+
+crit_grid_sum = set_up_grid(N)
 
 while t < t_max:
     ## choose point where the perturbation occurs    
@@ -205,6 +209,9 @@ while t < t_max:
         pbar.update(1)
         means.append(np.mean(grid))
         
+        crit_grid_sum += crit_grid
+        
+        
     t_post = t 
     
 
@@ -217,10 +224,11 @@ while t < t_max:
         distance.append(spatial_linear_distance(crit_grid, px, py))
   
     ## plot heatmaps of the crit_grid of avalanches with lifetimes larger than some value  
-    ##if t_post - t_pre > 4:  
+    #if t_post - t_pre > 40:  
     #    sns.heatmap(crit_grid)
     #    plt.text(95, 5, f'$\\tau$ = {t_post - t_pre} \n $f_{{tot}}$ = {np.sum(crit_grid)} \n $s$ = {spatial_linear_distance(crit_grid, px, py):.2f}', ha='right', va='top', color='white')
     #    plt.show()
+    
     
     
     means.append(np.mean(grid))
@@ -229,11 +237,17 @@ while t < t_max:
 
 pbar.close()
 
+sns.heatmap(crit_grid_sum, norm=LogNorm())
+plt.text(95, 5, f'perturbation = {type} \n boundary = {boundary_condition} ', ha='right', va='top', color='white')
+plt.show()
+
 ## write results into data frame
 df_results["lifetime"] = t_avalanche
 df_results["number"] = n_avalanche
 df_results['total dissipation'] = total_dissipation
 df_results["spatial linear size"] = distance
+
+df_results.to_csv(f'results_{type}_{boundary_condition}.csv', index=False, sep=';')
 
 print(df_results)
 
@@ -242,7 +256,8 @@ plt.plot(np.arange(t)[::1000], means[::1000])
 plt.show()
 
 ## plot lifetime of avalanches 
-plt.hist(t_avalanche, bins=np.linspace(0,25,25))
+plt.hist(t_avalanche, bins=np.arange(1000))
 plt.yscale('log')
+plt.xscale('log')
 plt.show()
 
