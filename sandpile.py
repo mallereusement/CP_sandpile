@@ -218,3 +218,4 @@ plt.show()
 plt.hist(t_avalanche, bins=np.linspace(0,25,25))
 plt.yscale('log')
 plt.show()
+
