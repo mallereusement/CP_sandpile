@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 import copy
+from tqdm import tqdm
 
 def set_bound_0(grid, N, boundary='open'):
     """set all borders to 0
@@ -160,6 +161,8 @@ distance = []           ## list where the spatial linear distance of each avalan
 t = 0                   ## time steps
 n = 0                   ## current number of avalanches
 
+pbar = tqdm(total = t_max, desc ="Running Simulation")
+
 while t < t_max:
     ## choose point where the perturbation occurs    
     px = np.random.randint(1, N)
@@ -189,11 +192,12 @@ while t < t_max:
             z = grid > crit_val
             
         t +=1
+        pbar.update(1)
         means.append(np.mean(grid))
         
     t_post = t 
     
-   
+
     
     if t_post - t_pre != 0:    ## if avalanche occurs, then this is valid
         t_avalanche.append(t_post - t_pre)          ## lifetime of the avalanche
@@ -211,6 +215,9 @@ while t < t_max:
     
     means.append(np.mean(grid))
     t += 1
+    pbar.update(1)
+
+pbar.close()
 
 ## write results into data frame
 df_results["lifetime"] = t_avalanche
