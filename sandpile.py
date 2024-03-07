@@ -5,7 +5,7 @@ import seaborn as sns
 import copy
 from tqdm import tqdm
 
-def set_bound_0(grid, N, boundary='open'):
+def set_bound_0(grid, N, boundary='open', d: int=2):
     """set all borders to 0
 
     Args:
@@ -16,21 +16,30 @@ def set_bound_0(grid, N, boundary='open'):
     Returns:
         np.ndarray: grid with the boundary condition applied (with borders set to 0)
     """
-    grid[0,:] = 0
-    grid[:,0] = 0
+    for axis in range(d):
+        slices = [slice(None)] * d
+        slices[axis] = 0
+        grid[tuple(slices)] = 0
+
     if boundary == 'closed':
-        grid[N-1,:] = 0
-        grid[:,N-1] = 0
+        for axis in range(d):
+            slices = [slice(None)] * d
+            slices[axis] = N-1
+            grid[tuple(slices)] = 0
     return grid
            
-def set_up_grid(N):
-    """Sets up the grid
+def set_up_grid(N: int, d: int=2) -> np.ndarray:
+    """Generates flat grid 
 
     Args:
-        N (int): number of rows/colums
+        N (int): Size of grid in one axis
+        d (int, optional): Dimension of Grid. Defaults to 2.
+
+    Returns:
+        np.ndarray: grid
     """
-    
-    return np.zeros(shape=(N,N))
+    shape = tuple([N] * d)
+    return np.zeros(shape=shape)
 
 def pertubation_mech(grid, N, point = 'random', type = 'conservative', boundary_condition = 'open', px=None, py=None):  ### ? wenn px und py übergeben werden, wird in der zweiten if-abfrage einfach die punkte von hier übergeben. Brauchen wir dann noch das point = 'random'? wir können da auch nach in px/py = None fragen? vielleicht zwei if-abfragen, dann kann man auch z.b. ein festes x eingeben und dann random y
     """applies a pertubation to a specific point in the grid
@@ -61,7 +70,7 @@ def pertubation_mech(grid, N, point = 'random', type = 'conservative', boundary_
     return grid
 
 def relax(grid, N, crit_val, boundary_condition='open', use_abs_val=False):   
-    """relaxation applied to the grid
+    """relaxation applied to the grid (only one time)
 
     Args:
         grid (np.ndarray): current grid
