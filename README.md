@@ -10,6 +10,8 @@
 - Power Spectrum
 - calculate exponents from simulation data
 - error calculation
+- folder for plots and data
+- 
 
 #### Ideas
 - generalize to d dimensions
@@ -19,3 +21,8 @@
 - intialize shape and look how long it takes to get detroyed by added sand
 - make animations of avalanches
 - 
+
+
+#### Questions
+- Power spectrum
+- heatmap: avalanches only at boundarys of grid?
