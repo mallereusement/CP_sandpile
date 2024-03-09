@@ -26,8 +26,11 @@ def conditional_expectation_value(variable: str, condition: str, df: pd.DataFram
     for value in range(int(vmin), int(vmax)):
         list = df[df[condition] == value][variable].to_numpy()
         
-        expectation = np.sum(list) / len(list)
-        expectation_list.append(expectation)
+        if list:
+            expectation = np.sum(list) / len(list)
+            expectation_list.append(expectation)
+        else:
+            expectation_list.append(0)
         xvals.append(value)
     return xvals, expectation_list
 
@@ -96,7 +99,7 @@ if __name__ == '__main__':
     boundary_condition = 'closed'
     file_for_plots = 'plots'
     results = pd.read_csv(f'results_{type}_{boundary_condition}.csv', sep=';')
-    
+
     ## lifetime
     plot_results(results, 'lifetime', np.arange(1,1000), type, boundary_condition, '$\\tau$', 'N($\\tau$)', file_for_plots)
 
