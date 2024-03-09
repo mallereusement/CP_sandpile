@@ -4,7 +4,7 @@
 #### Done
 - Plot P(S, T, L)
 - Plot conditional expectation values
-
+- generalize to d dimensions
 
 #### ToDo
 - Power Spectrum
@@ -14,7 +14,7 @@
 - 
 
 #### Ideas
-- generalize to d dimensions
+
 - initialize specific starting conditions
 - ability to make a shape in three dimensions and translate it into z-grid
 - what happens if sand is not just added random but follows a specific PDF?
