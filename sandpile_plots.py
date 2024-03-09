@@ -26,7 +26,7 @@ def conditional_expectation_value(variable: str, condition: str, df: pd.DataFram
     for value in range(int(vmin), int(vmax)):
         list = df[df[condition] == value][variable].to_numpy()
         
-        if list:
+        if np.any(list):
             expectation = np.sum(list) / len(list)
             expectation_list.append(expectation)
         else:
