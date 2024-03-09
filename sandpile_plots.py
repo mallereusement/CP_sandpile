@@ -7,7 +7,7 @@ boundary_condition = 'closed'
 
 results = pd.read_csv(f'results_{type}_{boundary_condition}.csv', sep=';')
 
-
+file_for_plots = 'plots'
 
 ## lifetime
 n_t, t_bins = np.histogram(results["lifetime"], bins=np.arange(1,1000))
@@ -17,7 +17,7 @@ plt.yscale('log')
 plt.xscale('log')
 plt.xlabel('$\\tau$')
 plt.ylabel('N($\\tau$)')
-plt.savefig(f'lifetime_{type}_{boundary_condition}.png')
+plt.savefig(f'{file_for_plots}/plotslifetime_{type}_{boundary_condition}.png')
 plt.show()
 
 ## total dissipation
@@ -28,7 +28,7 @@ plt.yscale('log')
 plt.xscale('log')
 plt.xlabel('s')
 plt.ylabel('N(s)')
-plt.savefig(f'tot_dissipation_{type}_{boundary_condition}.png')
+plt.savefig(f'{file_for_plots}/tot_dissipation_{type}_{boundary_condition}.png')
 plt.show()
 
 
@@ -40,7 +40,7 @@ plt.yscale('log')
 plt.xscale('log')
 plt.xlabel('l')
 plt.ylabel('N(l)')
-plt.savefig(f'size_{type}_{boundary_condition}.png')
+plt.savefig(f'{file_for_plots}/size_{type}_{boundary_condition}.png')
 plt.show()
 
 
@@ -84,5 +84,5 @@ for i in range(3):
             plt.xscale('log')
             plt.xlabel(short[j])
             plt.ylabel(f'E({short[i]}|{short[j]})')
-            plt.savefig(f'E_{short[i]}_{short[j]}_{type}_{boundary_condition}.png')
+            plt.savefig(f'{file_for_plots}/E_{short[i]}_{short[j]}_{type}_{boundary_condition}.png')
             plt.show()

@@ -210,6 +210,7 @@ total_dissipation = []  ## list where the total dissipation of each avalanche is
 distance = []           ## list where the spatial linear distance of each avalanche is stored
 t = 0                   ## time steps
 n = 0                   ## current number of avalanches
+file_for_simulation_data = 'simulation_data'
 
 pbar = tqdm(total = t_max, desc ="Running Simulation")
 
@@ -286,7 +287,7 @@ df_results["number"] = n_avalanche
 df_results['total dissipation'] = total_dissipation
 df_results["spatial linear size"] = distance
 
-df_results.to_csv(f'results_{type}_{boundary_condition}_{d}.csv', index=False, sep=';')
+df_results.to_csv(f'{file_for_simulation_data}/results_{type}_{boundary_condition}_{d}.csv', index=False, sep=';')
 
 print(df_results)
 
