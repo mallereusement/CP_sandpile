@@ -69,20 +69,13 @@ def pertubation_mech(grid: np.ndarray, N: int, p: np.ndarray, d:int=2, type: str
     """
     
     p[p==False] = np.random.randint(1,N)
-    #if px == None:
-    #    px = np.random.randint(1, N)
-    #if py == None:
-    #    py = np.random.randint(1, N)
-    
-    
+
     if type == 'conservative':
         grid[tuple(p)] += d 
         vecs = generate_unit_vecs(d)
         for i in range(d):
             grid[tuple(p-vecs[i])] -= 1
-        #grid[px, py - 1] -= 1
-        
-        
+              
     if type == 'non_conservative':
         grid[tuple(p)] += 1    
     
@@ -112,12 +105,7 @@ def relax(grid, N, crit_val, boundary_condition='open', use_abs_val=False, d:int
     for i in range(len(mask[0])):   
         vecs = generate_unit_vecs(d)
         p = np.array(mask)[:, i]
-        
-        
-        
-        #xi = mask[0][i]  
-        #yi = mask[1][i]
-        
+
         if use_abs_val:
             if grid[tuple(p)] > 0:
                 grid[tuple(p)] += -2*d + sum([1 if mask[j][i] == N-1 else 0 for j in range(0,d)])
@@ -127,16 +115,7 @@ def relax(grid, N, crit_val, boundary_condition='open', use_abs_val=False, d:int
                     if p[j] < N-1:
                         grid[tuple(p + vecs[j])] += 1
                     grid[tuple(p - vecs[j])] += 1
-                
-               # if xi < N-1:
-               #     grid[xi+1, yi] += 1
-               # if yi < N-1:
-               #     grid[xi, yi+1] += 1
-                    
-                    
-               # grid[xi-1, yi] += 1
-               # grid[xi, yi-1] += 1
-                
+
             elif grid[tuple(p)] < 0:
                 grid[tuple(p)] += 2*d - sum([1 if mask[j][i] == N-1 else 0 for j in range(0,d)])
                 
@@ -144,17 +123,7 @@ def relax(grid, N, crit_val, boundary_condition='open', use_abs_val=False, d:int
                     if p[j] < N-1:
                         grid[tuple(p + vecs[j])] -= 1
                     grid[tuple(p - vecs[j])] -= 1     
-                      
-           # elif grid[xi, yi] < 0:
-           #     grid[xi, yi] += 2*2 - sum([1 if mask[j][i] == N-1 else 0 for j in range(0,d)])
-           #     if xi < N-1:
-           #         grid[xi+1, yi] -= 1
-           #     if yi < N-1:
-           #         grid[xi, yi+1] -= 1
-           #     grid[xi-1, yi] -= 1
-           #     grid[xi, yi-1] -= 1
-                
-                
+
         else:
             if grid[tuple(p)] > 0:
                 grid[tuple(p)] += -2*d + sum([1 if mask[j][i] == N-1 else 0 for j in range(0,d)])
@@ -185,6 +154,8 @@ def spatial_linear_distance(crit_grid, p:tuple, d:int=2) -> float:
         pos = np.array(truth)[:, i]
         dist.append(np.sqrt(np.dot(p-pos, p-pos)))
     return np.max(dist)
+
+
 
 ## data frame to store results in
 df_results = pd.DataFrame(columns = ["number", "lifetime", "total dissipation", "spatial linear size"])
