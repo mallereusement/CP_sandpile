@@ -93,6 +93,12 @@ def fit_data(fit_function: str, bins: np.ndarray, data: np.ndarray) -> float:
 
 
 if __name__ == '__main__':
+
+
+    #### To check #####
+    ## look if std from numpy really creates the 68% confidence interval in this case
+    ## look if we can you least square fitting for this case
+    ## add error calculation for conditional expectation values, this is not implemented at the moment
     
     f_function = 'P_of_T'
     data_name = 'lifetime'
