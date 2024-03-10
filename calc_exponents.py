@@ -21,7 +21,7 @@ def exclude_outside_interval(bin_edges: np.ndarray, histogram_data: np.ndarray, 
         x_max (int): right bound
 
     Returns:
-        _type_: _description_
+        _type_: histogram data inside interval
     """
     min_index = np.searchsorted(bin_edges, x_min, side='left')
     max_index = np.searchsorted(bin_edges, x_max, side='right')
@@ -32,10 +32,17 @@ def exclude_outside_interval(bin_edges: np.ndarray, histogram_data: np.ndarray, 
     return truncated_bin_edges, truncated_histogram_data
 
 
-def get_exponent_from_simulation_data(fit_function: str, bins: np.ndarray, data: np.ndarray, bootstrap_size: int, x_limit: list=[]) -> unc.ufloat:
-    """Get exponent with uncertainty for specified distribution
+def get_exponent_from_simulation_data_conditional_exp_value() -> dict: # ToDo
+    pass
+
+def get_exponent_from_simulation_data_power_spectrum() -> dict: # ToDo
+    pass
+
+def get_exponent_from_simulation_data(mode: str, fit_function: str, bins: np.ndarray, df: pd.DataFrame, variable: str, bootstrap_size: int, x_limit: list=[]) -> dict:
+    """Get exponent with uncertainty for specified distribution and covariance matrix
 
     Args:
+        mode (str): normal, conditional_expectation_value, power_spectrum
         fit_function (str): specified distribution
         bins (np.ndarray): bins
         data (np.ndarray): simulation data
@@ -43,21 +50,35 @@ def get_exponent_from_simulation_data(fit_function: str, bins: np.ndarray, data:
         x_limit (list): define interval for fit. Default interval is provided by bins
 
     Returns:
-        unc.ufloat: exponent with uncertainty
+        dict: ["parameters"] Fit parameters with errors, ["covariance_matrix"] covariance matrix
     """
+
+    data, bins = np.histogram(df[variable], bins=bins)
+
     if x_limit:
         bins, data = exclude_outside_interval(bins, data, *x_limit)
 
     samples = generate_bootstrap_samples(data, bootstrap_size)
-    parameters = []
+
+    parameters_amp = []
+    parameters_exp = []
 
     for sample in samples:
-        parameter = fit_data(fit_function, bins, sample)
-        parameters.append(parameter)
-    parameters = np.array(parameters)
-    value = np.mean(parameters)
-    std = np.std(parameters)
-    return unc.ufloat(value, std)
+        m = fit_data(fit_function, bins, sample)
+        parameter_amp, parameter_exp = m.values['amp'], m.values['exponent']
+        parameters_amp.append(parameter_amp)
+        parameters_exp.append(parameter_exp)
+
+    parameters_amp = np.array(parameters_amp)
+    parameters_exp = np.array(parameters_exp)
+
+    cov_mat = np.cov(np.stack((parameters_amp, parameters_exp), axis = 0))
+    value_amp = np.mean(parameters_amp)
+    std_amp = np.std(parameters_amp)
+    value_exp = np.mean(parameters_exp)
+    std_exp = np.std(parameters_exp)
+
+    return {"parameters": [unc.ufloat(value_amp, std_amp), unc.ufloat(value_exp, std_exp)], "covariance_matrix": cov_mat}
 
 def generate_bootstrap_samples(data: np.ndarray, bootstrap_size: int) -> np.ndarray:
     """Generate bootstrap sample of size bootstrap_size for given simulation data
@@ -69,7 +90,7 @@ def generate_bootstrap_samples(data: np.ndarray, bootstrap_size: int) -> np.ndar
     Returns:
         np.ndarray: bootstrap_size bootstrap samples
     """
-    return np.array([np.random.choice(data, size=data.size, replace=True) for _ in range(R)])
+    return np.array([np.random.choice(data, size=data.size, replace=True) for _ in range(bootstrap_size)])
 
 def fit_data(fit_function: str, bins: np.ndarray, data: np.ndarray) -> float:
     """Fits fit_function to binned data and returns exponent
@@ -87,7 +108,7 @@ def fit_data(fit_function: str, bins: np.ndarray, data: np.ndarray) -> float:
     least_squares = LeastSquares(bin_centers, data, errors, fit_functions[fit_function])
     m = Minuit(least_squares, amp=data[0], exponent=1)
     m.migrad()
-    return m.values['exponent']
+    return m
 
 
 
@@ -106,12 +127,12 @@ if __name__ == '__main__':
     boundary_condition = 'closed'
     df = pd.read_csv(f'results_{type}_{boundary_condition}.csv', sep=';')
     bins = np.arange(1,1000)
-    data, bins = np.histogram(df[data_name], bins=bins)
     bootstrap_size = 1000
     x_limit = [0, 1000]
+    mode = "normal"
 
 
-    exponent = get_exponent_from_simulation_data(f, bins, data, bootstrap_size, x_limit = x_limit)
+    exponent = get_exponent_from_simulation_data(mode, f_function, bins, df, data_name, bootstrap_size, x_limit = x_limit)
 
     print(exponent)
 
