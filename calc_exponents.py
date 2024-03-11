@@ -133,9 +133,10 @@ def get_exponent_from_simulation_data_conditional_exp_value(fit_function: str, b
     for sample in samples:
         x, data = conditional_expectation_value(variable, condition, bins, sample, x_limit)
         m = fit_data(fit_function, x, unp.nominal_values(data), unp.std_devs(data), starting_values)
-        parameter_amp, parameter_exp = m.values['amp'], m.values['exponent']
-        parameters_amp.append(parameter_amp)
-        parameters_exp.append(parameter_exp)
+        if m.valid:
+            parameter_amp, parameter_exp = m.values['amp'], m.values['exponent']
+            parameters_amp.append(parameter_amp)
+            parameters_exp.append(parameter_exp)
 
     parameters_amp = np.array(parameters_amp)
     parameters_exp = np.array(parameters_exp)
@@ -192,9 +193,10 @@ def get_exponent_from_simulation_data(fit_function: str, bins: np.ndarray, df: p
         sample[sample == 0] = 1e-7 # avoid division by zero
         sample = sample.astype(np.longdouble)
         m = fit_data(fit_function, bin_centers, sample, np.sqrt(sample), starting_values)
-        parameter_amp, parameter_exp = m.values['amp'], m.values['exponent']
-        parameters_amp.append(parameter_amp)
-        parameters_exp.append(parameter_exp)
+        if m.valid:
+            parameter_amp, parameter_exp = m.values['amp'], m.values['exponent']
+            parameters_amp.append(parameter_amp)
+            parameters_exp.append(parameter_exp)
 
     parameters_amp = np.array(parameters_amp)
     parameters_exp = np.array(parameters_exp)
@@ -218,6 +220,7 @@ def fit_data(fit_function: str, x:np.ndarray, data: np.ndarray, errors: np.ndarr
     """
     least_squares = LeastSquares(x, data, errors, fit_functions[fit_function])
     m = Minuit(least_squares, *starting_values)
+    m.limits = [(0, None), (0.3, 4)]
     m.migrad()
     return m
 
