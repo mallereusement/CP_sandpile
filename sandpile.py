@@ -155,6 +155,9 @@ def spatial_linear_distance(crit_grid, p:tuple, d:int=2) -> float:
         dist.append(np.sqrt(np.dot(p-pos, p-pos)))
     return np.max(dist)
 
+def run_simulation():
+    pass
+
 
 
 ## data frame to store results in

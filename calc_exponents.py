@@ -6,11 +6,13 @@ from iminuit import Minuit
 import uncertainties as unc
 import matplotlib.pyplot as plt
 from uncertainties import unumpy as unp
+from tqdm import tqdm
 
 
 keys_of_fit_functions = ['P_of_S', 'P_of_T', 'P_of_L', 'E_of_S_T', 'E_of_T_S', 'E_of_S_L', 'E_of_L_S', 'E_of_T_L', 'E_of_L_T']
 
 fit_functions = static_definitions.exponent_functions()
+
 
 def conditional_expectation_value(variable: str, condition: str, bins: np.ndarray, df: pd.DataFrame, x_limit: list=[]):
     """calculates the conditional expectation value E(variable|condition)
@@ -23,7 +25,7 @@ def conditional_expectation_value(variable: str, condition: str, bins: np.ndarra
         x_limit (list): Default to  []. Set interval to use
 
     Returns:
-        np.ndarray, uarray: array with x values and the conditional expectation values
+        np.ndarray, unp.uarray: array with x values and the conditional expectation values
     """
     if x_limit:
         bins = exclude_outside_interval(bins, False, *x_limit)
@@ -66,9 +68,9 @@ def exclude_outside_interval(bin_edges: np.ndarray, histogram_data: np.ndarray, 
     min_index = np.searchsorted(bin_edges, x_min, side='left')
     max_index = np.searchsorted(bin_edges, x_max, side='right')
 
-    truncated_bin_edges = bin_edges[min_index:max_index+1]
+    truncated_bin_edges = bin_edges[min_index:max_index]
     if np.any(histogram_data):
-        truncated_histogram_data = histogram_data[min_index:max_index]
+        truncated_histogram_data = histogram_data[min_index:max_index-1]
         return truncated_bin_edges, truncated_histogram_data
     else:
         return truncated_bin_edges
@@ -99,9 +101,9 @@ def get_exponent_from_simulation_data_conditional_exp_value(fit_function: str, b
     parameters_amp = []
     parameters_exp = []
     x_org, data_org = conditional_expectation_value(variable, condition, bins, df, x_limit)
+    m_org = fit_data(fit_function, x_org, unp.nominal_values(data_org), unp.std_devs(data_org), starting_values)
 
     for sample in samples:
-
         x, data = conditional_expectation_value(variable, condition, bins, sample, x_limit)
         m = fit_data(fit_function, x, unp.nominal_values(data), unp.std_devs(data), starting_values)
         parameter_amp, parameter_exp = m.values['amp'], m.values['exponent']
@@ -112,12 +114,8 @@ def get_exponent_from_simulation_data_conditional_exp_value(fit_function: str, b
     parameters_exp = np.array(parameters_exp)
 
     cov_mat = np.cov(np.stack((parameters_amp, parameters_exp), axis = 0))
-    value_amp = np.mean(parameters_amp)
-    std_amp = np.std(parameters_amp)
-    value_exp = np.mean(parameters_exp)
-    std_exp = np.std(parameters_exp)
 
-    return {"parameters": [unc.ufloat(value_amp, std_amp), unc.ufloat(value_exp, std_exp)], "covariance_matrix": cov_mat, "x": x, "data": unp.nominal_values(data_org), "errors": unp.std_devs(data_org), "model": fit_functions[fit_function](x, value_amp, value_exp), "samples": samples}
+    return {"parameters": [unc.ufloat(m_org.values['amp'], cov_mat[0,0]**0.5), unc.ufloat(m_org.values['exponent'], cov_mat[1,1]**0.5)], "covariance_matrix": cov_mat, "x": x, "data": unp.nominal_values(data_org), "errors": unp.std_devs(data_org), "model": fit_functions[fit_function](x, m_org.values['amp'], m_org.values['exponent']), "samples": samples}
 
 
 def generate_bootstrap_samples(data, bootstrap_size: int):
@@ -161,8 +159,10 @@ def get_exponent_from_simulation_data(fit_function: str, bins: np.ndarray, df: p
     errors = np.sqrt(samples)
     parameters_amp = []
     parameters_exp = []
+    m_org = fit_data(fit_function, bin_centers, data, np.sqrt(data), starting_values)
 
     for sample, error in zip(samples, errors):
+        
         m = fit_data(fit_function, bin_centers, sample, error, starting_values)
         parameter_amp, parameter_exp = m.values['amp'], m.values['exponent']
         parameters_amp.append(parameter_amp)
@@ -172,12 +172,8 @@ def get_exponent_from_simulation_data(fit_function: str, bins: np.ndarray, df: p
     parameters_exp = np.array(parameters_exp)
 
     cov_mat = np.cov(np.stack((parameters_amp, parameters_exp), axis = 0))
-    value_amp = np.mean(parameters_amp)
-    std_amp = np.std(parameters_amp)
-    value_exp = np.mean(parameters_exp)
-    std_exp = np.std(parameters_exp)
 
-    return {"parameters": [unc.ufloat(value_amp, std_amp), unc.ufloat(value_exp, std_exp)], "covariance_matrix": cov_mat, "x": bin_centers, "data": data, "errors": errors, "model": fit_functions[fit_function](bin_centers, value_amp, value_exp), "samples": samples}
+    return {"parameters": [unc.ufloat(m_org.values['amp'], cov_mat[0,0]**0.5), unc.ufloat(m_org.values['exponent'], cov_mat[1,1]**0.5)], "covariance_matrix": cov_mat, "x": bin_centers, "data": unp.nominal_values(data), "errors": unp.std_devs(data), "model": fit_functions[fit_function](bin_centers, m_org.values['amp'], m_org.values['exponent']), "samples": samples}
 
 
 def fit_data(fit_function: str, x:np.ndarray, data: np.ndarray, errors: np.ndarray, starting_values: list) -> float:
@@ -197,53 +193,201 @@ def fit_data(fit_function: str, x:np.ndarray, data: np.ndarray, errors: np.ndarr
     m.migrad()
     return m
 
+def save_exponent_data(simulation_parameters: dict, analysis_parameters: dict, fit_parameter: dict, fit_results: dict, file_to_save, file_to_load=False) -> None:
+    """_summary_
 
+    Args:
+        simulation_parameters (dict): _description_
+        analysis_parameters (dict): _description_
+        fit_parameter (dict): _description_
+        fit_results (dict): _description_
+        file_to_save (_type_): _description_
+        file_to_load (bool, optional): _description_. Defaults to False.
+    """
+    if fit_parameter['x_limit']:
+        bins_start = fit_parameter['x_limit'][0]
+        bins_end = fit_parameter['x_limit'][1]
+        min_index = np.searchsorted(fit_parameter['bins'], bins_start, side='left')
+        max_index = np.searchsorted(fit_parameter['bins'], bins_end, side='right')
+        bins_count = len(fit_parameter['bins'][min_index:max_index])
+    else:
+        bins_start = fit_parameter['bins'][0]
+        bins_end = fit_parameter['bins'][-1]       
+        bins_count = len(fit_parameter['bins'])
 
+    temp_df = pd.DataFrame({'boundary condition': [simulation_parameters['boundary_condition']], 'pertubation mechanism': [simulation_parameters['type']], 'fit function': [analysis_parameters['fit_function']], 'variable': [analysis_parameters['variable']], 'condition': [analysis_parameters['condition']], 'left bin edge': [bins_start], 'right bin edge': [bins_end], 'count of bins': [bins_count], 'bootstrap size': [fit_parameter['bootstrap_size']], 'amplitude from fit result': [fit_results['parameters'][0]], 'exponent from fit result': [fit_results['parameters'][1]], 'covariance c_11': [fit_results['covariance_matrix'][0,0]], 'covariance c_12': [fit_results['covariance_matrix'][0,1]], 'covariance c_22': [fit_results['covariance_matrix'][1,1]]})
+    
+    if not file_to_load:
+        temp_df.to_csv(file_to_save, sep=';', encoding='utf8', index=False)
+    else:
+        df = pd.read_csv(file_to_load, sep=';', encoding='utf8')
+        df = pd.concat([df, temp_df], ignore_index=True)
+        df.to_csv(file_to_save, sep=';', encoding='utf8', index=False)
+
+def load_simulation_data(sim_data: dict) -> pd.DataFrame:
+    """_summary_
+
+    Args:
+        sim_data (dict): _description_
+
+    Returns:
+        pd.DataFrame: _description_
+    """
+    file = f"results_{sim_data['type']}_{sim_data['boundary_condition']}.csv"
+    return pd.read_csv(file, sep=';', encoding='utf8')
 
 if __name__ == '__main__':
 
 
-    #### To check #####
-    ## look if std from numpy really creates the 68% confidence interval in this case
-    ## look if we can you least square fitting for this case
-    ## add error calculation for conditional expectation values, this is not implemented at the moment
-    
-    #f_function = 'P_of_T'
-    #variable = 'lifetime'
-    #x_limit = [0, 100]
+    #### To Do #####
+    ## exponent calculation for power spectrum
+    ## calculate product of expontents and also take covariance in account here
 
-    #f_function = 'P_of_S'
-    #variable = 'total dissipation'
-    #x_limit = [0, 200]
+    simulation_parameter = {
+        'type': 'non_conservative',
+        'boundary_condition': 'closed',
+    }
 
-    #f_function = 'P_of_L'
-    #variable = 'spatial linear size'
-    #x_limit = [0, 60]
+    analysis_parameter = {
+    'setting1': {
+        'fit_function': 'E_of_T_S',
+        'variable': 'lifetime',
+        'condition': 'total dissipation',
+        'xlabel': 's',
+        'ylabel': 'E($\\tau$|s)'
+    },
+    'setting2': {
+        'fit_function': 'E_of_S_T',
+        'variable': 'total dissipation',
+        'condition': 'lifetime',
+        'xlabel': '$\\tau$',
+        'ylabel': 'E(s|$\\tau$)'
+    },
+    'setting3': {
+        'fit_function': 'E_of_T_L',
+        'variable': 'lifetime',
+        'condition': 'spatial linear size',
+        'xlabel': 'l',
+        'ylabel': 'E($\\tau$|l)'
+    },
+    'setting4': {
+        'fit_function': 'E_of_L_T',
+        'variable': 'spatial linear size',
+        'condition': 'lifetime',
+        'xlabel': '$\\tau$',
+        'ylabel': 'E(l|$\\tau$)'
+    },
+    'setting5': {
+        'fit_function': 'E_of_L_S',
+        'variable': 'spatial linear size',
+        'condition': 'total dissipation',
+        'xlabel': 's',
+        'ylabel': 'E(l|s)'
+    },
+    'setting6': {
+        'fit_function': 'E_of_S_L',
+        'variable': 'total dissipation',
+        'condition': 'spatial linear size',
+        'xlabel': 'l',
+        'ylabel': 'E(s|l)'
+    },
+    'setting7': {
+        'fit_function': 'P_of_T',
+        'variable': 'lifetime',
+        'condition': '-',
+        'xlabel': '$\\tau$',
+        'ylabel': 'N($\\tau$)'
+    },
+    'setting8': {
+        'fit_function': 'P_of_L',
+        'variable': 'spatial linear size',
+        'condition': '-',
+        'xlabel': '$l',
+        'ylabel': 'N(l)'
+    },
+    'setting9': {
+        'fit_function': 'P_of_S',
+        'variable': 'total dissipation',
+        'condition': '-',
+        'xlabel': 's',
+        'ylabel': 'N(s)'
+    }}
 
-    f_function = 'E_of_T_S'
-    variable = 'lifetime'
-    condition = 'total dissipation'
-    x_limit = [10, 100]
+    fit_parameter = {
+    'setting1': {
+        'bins': np.arange(1,1000),
+        'x_limit': [10, 400],
+        'bootstrap_size': 100
+    },
+    'setting2': {
+        'bins': np.arange(1,1000),
+        'x_limit': [10, 400],
+        'bootstrap_size': 100
+    },
+    'setting3': {
+        'bins': np.arange(1,1000),
+        'x_limit': [10, 20],
+        'bootstrap_size': 100
+    },
+    'setting4': {
+        'bins': np.arange(1,1000),
+        'x_limit': [10, 100],
+        'bootstrap_size': 100
+    },
+    'setting5': {
+        'bins': np.arange(1,1000),
+        'x_limit': [10, 400],
+        'bootstrap_size': 100
+    },
+    'setting6': {
+        'bins': np.arange(1,1000),
+        'x_limit': [10, 20],
+        'bootstrap_size': 100
+    },
+    'setting7': {
+        'bins': np.arange(1,1000),
+        'x_limit': [10, 200],
+        'bootstrap_size': 100
+    },
+    'setting8': {
+        'bins': np.arange(1,1000),
+        'x_limit': [10, 60],
+        'bootstrap_size': 100
+    },
+    'setting9': {
+        'bins': np.arange(1,1000),
+        'x_limit': [10, 500],
+        'bootstrap_size': 100
+    }}
 
-    type = 'non_conservative'
-    boundary_condition = 'closed'
-    df = pd.read_csv(f'results_{type}_{boundary_condition}.csv', sep=';')
-    bins = np.arange(1,1000)
-    bootstrap_size = 100
+    df = load_simulation_data(simulation_parameter)
+
+    file_for_saving = 'exponent_calculation/20240311.csv'
+
+    pbar = tqdm(total = 9, desc ="Running Exponent Calculation")
+    for ana_para, fit_para in zip(analysis_parameter, fit_parameter):
+        if analysis_parameter[ana_para]['condition'] == '-':
+            result = get_exponent_from_simulation_data(analysis_parameter[ana_para]['fit_function'], fit_parameter[fit_para]['bins'], df, analysis_parameter[ana_para]['variable'], fit_parameter[fit_para]['bootstrap_size'], x_limit = fit_parameter[fit_para]['x_limit'])
+            save_exponent_data(simulation_parameter, analysis_parameter[ana_para], fit_parameter[fit_para], result, file_for_saving, file_to_load=file_for_saving)
+            pbar.update(1)
+        else:
+            result = get_exponent_from_simulation_data_conditional_exp_value(analysis_parameter[ana_para]['fit_function'], fit_parameter[fit_para]['bins'], df, analysis_parameter[ana_para]['variable'], analysis_parameter[ana_para]['condition'], fit_parameter[fit_para]['bootstrap_size'], x_limit = fit_parameter[fit_para]['x_limit'])
+            save_exponent_data(simulation_parameter, analysis_parameter[ana_para], fit_parameter[fit_para], result, file_for_saving, file_to_load=file_for_saving)
+
+        fig, ax = plt.subplots()
+        ax.errorbar(result["x"], result["data"], yerr=result["errors"], fmt='o', color='blue', capsize=3, markersize=4, label='Simulation Data', zorder=1)
+        ax.plot(result["x"], result["model"], color="orange", linewidth=2, label="Model", zorder=2)
+        ax.set_yscale('log')
+        ax.set_xscale('log')
+        ax.legend()
+        ax.set_xlabel(analysis_parameter[ana_para]['xlabel'])
+        ax.set_ylabel(analysis_parameter[ana_para]['ylabel'])
+        plt.savefig(f"exponent_calculation/plots/{analysis_parameter[ana_para]['fit_function']}.jpg", dpi=300)
+        pbar.update(1)
+    pbar.close()
 
 
-    result = get_exponent_from_simulation_data(f_function, bins, df, variable, bootstrap_size, x_limit = x_limit)
-    result = get_exponent_from_simulation_data_conditional_exp_value(f_function, bins, df, variable, condition, bootstrap_size, x_limit = x_limit)
 
 
-    print(result["parameters"])
-    print(result["covariance_matrix"])
-
-    fig, ax = plt.subplots()
-    ax.scatter(result["x"], result["data"], color="blue")
-    ax.plot(result["x"], result["model"], color="orange")
-    ax.set_yscale('log')
-    ax.set_xscale('log')
-    plt.show()
 
 
