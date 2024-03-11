@@ -14,7 +14,7 @@ keys_of_fit_functions = ['P_of_S', 'P_of_T', 'P_of_L', 'E_of_S_T', 'E_of_T_S', '
 fit_functions = static_definitions.exponent_functions()
 
 
-def conditional_expectation_value(variable: str, condition: str, bins: np.ndarray, df: pd.DataFrame, x_limit: list=[]):
+def conditional_expectation_value(variable: str, condition: str, bins: np.ndarray, df: pd.DataFrame, x_limit: list=[], get_error_with_bootstrapping: bool=False):
     """calculates the conditional expectation value E(variable|condition)
 
     Args:
@@ -34,22 +34,49 @@ def conditional_expectation_value(variable: str, condition: str, bins: np.ndarra
 
     expectation_list = []
     expectation_list_err = []
-    
+
     for left_edge, right_edge in zip(bins[:-1], bins[1:]):
         list = df[(df[condition] >= left_edge) & (df[condition] < right_edge)][variable].to_numpy()
-        err = np.sqrt(list)
-        list = unp.uarray(list, err)
-        
+
         if np.any(list):
-            
+                
             expectation = np.sum(list) / len(list)
-            
-            expectation_list.append(expectation.n)
-            expectation_list_err.append(expectation.s)
+                
+            expectation_list.append(expectation)
+            expectation_list_err.append(expectation)
         else:
             expectation_list.append(0)   
             expectation_list_err.append(1)     
     expectation_list = unp.uarray(expectation_list, expectation_list_err)
+
+
+    if get_error_with_bootstrapping:
+        pbar = tqdm(total = 1000, desc ="Running Bootstrap for Error Estimation of conditional expectation value")
+        samples = generate_bootstrap_samples(df, 1000)
+        expectation_list_bootstrap_global = []
+        for sample in samples:
+            expectation_list_bootstrap = []
+            for left_edge, right_edge in zip(bins[:-1], bins[1:]):
+                list = sample[(sample[condition] >= left_edge) & (sample[condition] < right_edge)][variable].to_numpy()
+
+                if np.any(list):
+                    
+                    expectation = np.sum(list) / len(list)
+                    
+                    expectation_list_bootstrap.append(expectation)
+                else:
+                    expectation_list_bootstrap.append(0)   
+            pbar.update(1)
+            expectation_list_bootstrap = np.array(expectation_list_bootstrap)
+            expectation_list_bootstrap_global.append(expectation_list_bootstrap)
+        pbar.close()
+        expectation_list_bootstrap_global = np.array(expectation_list_bootstrap_global)
+        stds = np.std(expectation_list_bootstrap_global, axis=0)
+        expectation_list = unp.uarray(unp.nominal_values(expectation_list), stds)
+
+    
+
+
     return bin_centers, expectation_list
 
 
@@ -100,7 +127,7 @@ def get_exponent_from_simulation_data_conditional_exp_value(fit_function: str, b
 
     parameters_amp = []
     parameters_exp = []
-    x_org, data_org = conditional_expectation_value(variable, condition, bins, df, x_limit)
+    x_org, data_org = conditional_expectation_value(variable, condition, bins, df, x_limit, get_error_with_bootstrapping=True)
     m_org = fit_data(fit_function, x_org, unp.nominal_values(data_org), unp.std_devs(data_org), starting_values)
 
     for sample in samples:
@@ -156,14 +183,15 @@ def get_exponent_from_simulation_data(fit_function: str, bins: np.ndarray, df: p
     samples = generate_bootstrap_samples(df, bootstrap_size)
     hist_data = [np.histogram(i[variable], bins=bins)[0] for i in samples]
     samples = np.array([i for i in hist_data])
-    errors = np.sqrt(samples)
     parameters_amp = []
     parameters_exp = []
     m_org = fit_data(fit_function, bin_centers, data, np.sqrt(data), starting_values)
 
-    for sample, error in zip(samples, errors):
-        
-        m = fit_data(fit_function, bin_centers, sample, error, starting_values)
+    for sample in samples:
+
+        sample[sample == 0] = 1e-7 # avoid division by zero
+        sample = sample.astype(np.longdouble)
+        m = fit_data(fit_function, bin_centers, sample, np.sqrt(sample), starting_values)
         parameter_amp, parameter_exp = m.values['amp'], m.values['exponent']
         parameters_amp.append(parameter_amp)
         parameters_exp.append(parameter_exp)
@@ -173,7 +201,7 @@ def get_exponent_from_simulation_data(fit_function: str, bins: np.ndarray, df: p
 
     cov_mat = np.cov(np.stack((parameters_amp, parameters_exp), axis = 0))
 
-    return {"parameters": [unc.ufloat(m_org.values['amp'], cov_mat[0,0]**0.5), unc.ufloat(m_org.values['exponent'], cov_mat[1,1]**0.5)], "covariance_matrix": cov_mat, "x": bin_centers, "data": unp.nominal_values(data), "errors": unp.std_devs(data), "model": fit_functions[fit_function](bin_centers, m_org.values['amp'], m_org.values['exponent']), "samples": samples}
+    return {"parameters": [unc.ufloat(m_org.values['amp'], cov_mat[0,0]**0.5), unc.ufloat(m_org.values['exponent'], cov_mat[1,1]**0.5)], "covariance_matrix": cov_mat, "x": bin_centers, "data": data, "errors": np.sqrt(data), "model": fit_functions[fit_function](bin_centers, m_org.values['amp'], m_org.values['exponent']), "samples": samples}
 
 
 def fit_data(fit_function: str, x:np.ndarray, data: np.ndarray, errors: np.ndarray, starting_values: list) -> float:
@@ -302,7 +330,7 @@ if __name__ == '__main__':
         'fit_function': 'P_of_L',
         'variable': 'spatial linear size',
         'condition': '-',
-        'xlabel': '$l',
+        'xlabel': 'l',
         'ylabel': 'N(l)'
     },
     'setting9': {
@@ -374,15 +402,29 @@ if __name__ == '__main__':
             result = get_exponent_from_simulation_data_conditional_exp_value(analysis_parameter[ana_para]['fit_function'], fit_parameter[fit_para]['bins'], df, analysis_parameter[ana_para]['variable'], analysis_parameter[ana_para]['condition'], fit_parameter[fit_para]['bootstrap_size'], x_limit = fit_parameter[fit_para]['x_limit'])
             save_exponent_data(simulation_parameter, analysis_parameter[ana_para], fit_parameter[fit_para], result, file_for_saving, file_to_load=file_for_saving)
 
-        fig, ax = plt.subplots()
-        ax.errorbar(result["x"], result["data"], yerr=result["errors"], fmt='o', color='blue', capsize=3, markersize=4, label='Simulation Data', zorder=1)
-        ax.plot(result["x"], result["model"], color="orange", linewidth=2, label="Model", zorder=2)
-        ax.set_yscale('log')
-        ax.set_xscale('log')
-        ax.legend()
-        ax.set_xlabel(analysis_parameter[ana_para]['xlabel'])
-        ax.set_ylabel(analysis_parameter[ana_para]['ylabel'])
+        fig, (ax1, ax2) = plt.subplots(2, 1, gridspec_kw={'height_ratios': [3, 1]}, figsize=(8, 6), sharex=True)
+
+        # Plot main data and model
+        ax1.errorbar(result["x"], result["data"], yerr=result["errors"], fmt='o', color='blue', capsize=3, markersize=4, label='Simulation Data', zorder=1)
+        ax1.plot(result["x"], result["model"], color="orange", linewidth=2, label="Model", zorder=2)
+        ax1.set_yscale('log')
+        ax1.set_xscale('log')
+        ax1.legend()
+        ax1.set_ylabel(analysis_parameter[ana_para]['ylabel'])
+
+        # Calculate errors divided by difference between data and model
+        error_ratio = (result["data"] - result["model"]) / result["errors"]
+
+        # Plot error ratio
+        ax2.scatter(result["x"], error_ratio, color='red')
+        ax2.set_xscale('log')  # Set x-axis scale to logarithmic
+        ax2.set_xlabel(analysis_parameter[ana_para]['xlabel'])
+        ax2.set_ylabel("(Data - Model) / Errors")
+        ax2.set_ylim(-5, 5)
+
+        plt.tight_layout()
         plt.savefig(f"exponent_calculation/plots/{analysis_parameter[ana_para]['fit_function']}.jpg", dpi=300)
+        
         pbar.update(1)
     pbar.close()
 

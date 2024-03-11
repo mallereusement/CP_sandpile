@@ -166,9 +166,9 @@ df_results = pd.DataFrame(columns = ["number", "lifetime", "total dissipation", 
 ## input values
 N = 10
 crit_val = 3
-t_max = 2e6
-d=3
-
+t_max = 2e7
+d=2
+tag = '20241103'
 ## settings for the algorithm
 use_abs_value = True
 type = 'non_conservative'
@@ -261,7 +261,7 @@ df_results["number"] = n_avalanche
 df_results['total dissipation'] = total_dissipation
 df_results["spatial linear size"] = distance
 
-df_results.to_csv(f'{file_for_simulation_data}/results_{type}_{boundary_condition}_{d}.csv', index=False, sep=';')
+df_results.to_csv(f'{file_for_simulation_data}/results_{type}_{boundary_condition}_{d}_{tag}.csv', index=False, sep=';')
 
 print(df_results)
 
