@@ -196,7 +196,7 @@ def run_simulation(simulation_parameter: dict, filepath_datastorage: str, simula
         }
     ####################################################################################
     
-    pbar = tqdm(total = max_t, desc =f"Running Simulation {simulation_name}")
+    pbar = tqdm(total = maximum_avalanches, desc =f"Running Simulation {simulation_name}")
 
     ### Simulation algorithm ###########################################################
 
@@ -245,7 +245,6 @@ def run_simulation(simulation_parameter: dict, filepath_datastorage: str, simula
                 dissipation_tau.append(np.sum(crit_grid_tau)) # Store dissipation rate at time t
             
             t +=1 # update time
-            pbar.update(1)
             
             if simulation_parameter['save mean value of grid']:
                 means['mean'].append(np.mean(grid))
@@ -255,7 +254,7 @@ def run_simulation(simulation_parameter: dict, filepath_datastorage: str, simula
 
         
         if t_post - t_pre != 0: # if avalanche occurs, then this is valid
-            
+            pbar.update(1)
 
             if simulation_parameter['save file for exponent calculation']:
                 exp_data['timestep'].append(t_pre)
@@ -271,7 +270,6 @@ def run_simulation(simulation_parameter: dict, filepath_datastorage: str, simula
 
 
         t += 1 # update time
-        pbar.update(1)
     pbar.close()
 
     #### Save Data ####
