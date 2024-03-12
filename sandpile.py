@@ -6,6 +6,8 @@ import copy
 from tqdm import tqdm
 from matplotlib.colors import LogNorm
 
+
+
 def set_bound_0(grid: np.ndarray, N: int, boundary: str='open', d: int=2) -> np.ndarray:
     """set all borders to 0
 
@@ -274,4 +276,3 @@ plt.hist(t_avalanche, bins=np.arange(1000))
 plt.yscale('log')
 plt.xscale('log')
 plt.show()
-
