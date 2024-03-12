@@ -1,10 +1,10 @@
 boundary condition;pertubation mechanism;fit function;variable;condition;left bin edge;right bin edge;count of bins;bootstrap size;amplitude from fit result;exponent from fit result;covariance c_11;covariance c_12;covariance c_22
-closed;non_conservative;E_of_T_S;lifetime;total dissipation;10;400;391;100;1.41+/-0.18;1.5+/-1.2;0.0336561226968521;0.0235441093811112;1.415383767004484
-closed;non_conservative;E_of_S_T;total dissipation;lifetime;10;400;391;100;0.50+/-0.21;1.6+/-0.5;0.0433618650058831;0.1039824912134339;0.2514460881761538
-closed;non_conservative;E_of_T_L;lifetime;spatial linear size;10;20;11;100;1.22+/-0.09;1.282+/-0.028;0.0074958389932654;-0.0023852565745502;0.0007635269888392
-closed;non_conservative;E_of_L_T;spatial linear size;lifetime;10;100;91;100;0.747+/-0.011;1.210+/-0.006;0.0001123488944888;6.416965439293787e-05;3.744555092302127e-05
-closed;non_conservative;E_of_L_S;spatial linear size;total dissipation;10;400;391;100;1.0+/-0.5;1.8+/-1.0;0.237227516911357;0.4442027637374247;1.0625428893165414
-closed;non_conservative;E_of_S_L;total dissipation;spatial linear size;10;20;11;100;0.70+/-0.08;2.05+/-0.04;0.0058867513953671;-0.0032084265491169;0.0017654771478262
-closed;non_conservative;P_of_T;lifetime;-;10;200;191;100;(9.74+/-0.35)e+03;2.175+/-0.010;124914.92862361252;3.406267361336492;9.363937944856796e-05
-closed;non_conservative;P_of_L;spatial linear size;-;10;60;51;100;(9.2+/-0.6)e+03;2.130+/-0.019;315349.40624558576;10.66759804005478;0.0003615408963552
-closed;non_conservative;P_of_S;total dissipation;-;10;500;491;100;(6.16+/-0.15)e+03;2.140+/-0.005;22505.33441126952;0.811900407333634;2.9873877338451627e-05
+closed;non_conservative;E_of_T_S;lifetime;total dissipation;10;400;391;100;1.408+/-0.009;1.538+/-0.004;8.245067465839669e-05;3.2295884083882994e-05;1.3762858929548115e-05
+closed;non_conservative;E_of_S_T;total dissipation;lifetime;10;400;391;100;0.500+/-0.005;1.6005+/-0.0026;2.7862640835183355e-05;-1.3361267743955402e-05;6.833713372598827e-06
+closed;non_conservative;E_of_T_L;lifetime;spatial linear size;10;20;11;100;1.22+/-0.09;1.281+/-0.027;0.0077062871339481;-0.0023409044649269;0.0007152959738595
+closed;non_conservative;E_of_L_T;spatial linear size;lifetime;10;100;91;100;0.747+/-0.007;1.210+/-0.004;4.240773540447256e-05;2.41387603756598e-05;1.450686425197144e-05
+closed;non_conservative;E_of_L_S;spatial linear size;total dissipation;10;400;391;100;0.974+/-0.008;1.845+/-0.007;5.959138836728755e-05;4.927804171350449e-05;4.264104846497495e-05
+closed;non_conservative;E_of_S_L;total dissipation;spatial linear size;10;20;11;100;0.71+/-0.07;2.05+/-0.04;0.0045771396169808;-0.0024681255535876;0.0013463779974387
+closed;non_conservative;P_of_T;lifetime;-;10;200;191;100;(9.74+/-0.30)e+03;2.175+/-0.008;91878.36012172607;2.5100179083594862;6.920953669559218e-05
+closed;non_conservative;P_of_L;spatial linear size;-;10;60;51;100;(9.2+/-0.5)e+03;2.130+/-0.018;289617.5667288371;9.784496555159244;0.0003313867267222
+closed;non_conservative;P_of_S;total dissipation;-;10;500;491;100;(6.16+/-0.26)e+03;2.140+/-0.010;68025.57078717892;2.54910351319638;9.72592645446996e-05

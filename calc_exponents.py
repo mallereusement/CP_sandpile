@@ -39,11 +39,12 @@ def conditional_expectation_value(variable: str, condition: str, bins: np.ndarra
         list = df[(df[condition] >= left_edge) & (df[condition] < right_edge)][variable].to_numpy()
 
         if np.any(list):
-                
+
+            list = unp.uarray(list, np.sqrt(list))    
             expectation = np.sum(list) / len(list)
                 
-            expectation_list.append(expectation)
-            expectation_list_err.append(expectation)
+            expectation_list.append(unp.nominal_values(expectation))
+            expectation_list_err.append(unp.std_devs(expectation))
         else:
             expectation_list.append(0)   
             expectation_list_err.append(1)     
@@ -132,7 +133,7 @@ def get_exponent_from_simulation_data_conditional_exp_value(fit_function: str, b
 
     for sample in samples:
         x, data = conditional_expectation_value(variable, condition, bins, sample, x_limit)
-        m = fit_data(fit_function, x, unp.nominal_values(data), unp.std_devs(data), starting_values)
+        m = fit_data(fit_function, x, unp.nominal_values(data), unp.std_devs(data_org), starting_values)
         if m.valid:
             parameter_amp, parameter_exp = m.values['amp'], m.values['exponent']
             parameters_amp.append(parameter_amp)
