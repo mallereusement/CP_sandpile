@@ -7,6 +7,7 @@
     - boundary condition: closed
     - use absolute value: True
     - number of activated avalanches: 30000
+    - maximum time steps: 20000000
     - save file for power spectrum calculation: True
     - save file for exponent calculation: True
     - save mean value of grid: False
@@ -20,6 +21,7 @@
     - boundary condition: closed
     - use absolute value: True
     - number of activated avalanches: 30000
+    - maximum time steps: 20000000
     - save file for power spectrum calculation: True
     - save file for exponent calculation: True
     - save mean value of grid: False
@@ -33,6 +35,7 @@
     - boundary condition: closed
     - use absolute value: True
     - number of activated avalanches: 30000
+    - maximum time steps: 20000000
     - save file for power spectrum calculation: True
     - save file for exponent calculation: True
     - save mean value of grid: False
@@ -48,6 +51,7 @@
     - boundary condition: closed
     - use absolute value: True
     - number of activated avalanches: 30000
+    - maximum time steps: 20000000
     - save file for power spectrum calculation: True
     - save file for exponent calculation: True
     - save mean value of grid: False
@@ -65,6 +69,7 @@
     - boundary condition: open
     - use absolute value: True
     - number of activated avalanches: 30000
+    - maximum time steps: 20000000
     - save file for power spectrum calculation: True
     - save file for exponent calculation: True
     - save mean value of grid: False
@@ -78,6 +83,7 @@
     - boundary condition: open
     - use absolute value: True
     - number of activated avalanches: 30000
+    - maximum time steps: 20000000
     - save file for power spectrum calculation: True
     - save file for exponent calculation: True
     - save mean value of grid: False
@@ -91,6 +97,7 @@
     - boundary condition: open
     - use absolute value: True
     - number of activated avalanches: 30000
+    - maximum time steps: 20000000
     - save file for power spectrum calculation: True
     - save file for exponent calculation: True
     - save mean value of grid: False
@@ -109,6 +116,7 @@
     - boundary condition: open
     - use absolute value: True
     - number of activated avalanches: 30000
+    - maximum time steps: 20000000
     - save file for power spectrum calculation: True
     - save file for exponent calculation: True
     - save mean value of grid: False
@@ -122,6 +130,7 @@
     - boundary condition: open
     - use absolute value: True
     - number of activated avalanches: 30000
+    - maximum time steps: 20000000
     - save file for power spectrum calculation: True
     - save file for exponent calculation: True
     - save mean value of grid: False
@@ -135,6 +144,7 @@
     - boundary condition: open
     - use absolute value: True
     - number of activated avalanches: 30000
+    - maximum time steps: 20000000
     - save file for power spectrum calculation: True
     - save file for exponent calculation: True
     - save mean value of grid: False

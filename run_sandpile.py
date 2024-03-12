@@ -30,7 +30,7 @@ def save_simulation_parameters(filepath:str, parameters: dict) -> None:
     with open(filepath, 'w') as json_file:
         json.dump(parameters, json_file, indent=4)
 
-format_int = ['dimension', 'size of grid', 'crititcal value of z', 'number of activated avalanches']
+format_int = ['dimension', 'size of grid', 'crititcal value of z', 'number of activated avalanches', 'maximum time steps']
 format_bool = ['use absolute value', 'save file for power spectrum calculation', 'save file for exponent calculation', 'save mean value of grid']
 
 if __name__ == '__main__':

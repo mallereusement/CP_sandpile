@@ -173,6 +173,7 @@ def run_simulation(simulation_parameter: dict, filepath_datastorage: str, simula
     boundary_condition = simulation_parameter['boundary condition']
     crit_val = simulation_parameter['crititcal value of z']
     maximum_avalanches = simulation_parameter['number of activated avalanches']
+    max_t = simulation_parameter['maximum time steps']
     ###################################################################################
 
     ### Initialize storage for power spectrum data and/or exponent calculation data and/or mean data ###
@@ -204,7 +205,7 @@ def run_simulation(simulation_parameter: dict, filepath_datastorage: str, simula
     t = 0 # Initialize time tracker
     count_avalanches = 0 # Track number of triggered avalanches
 
-    while count_avalanches < maximum_avalanches: # Run simulation until maximum time steps or maximum avalanches are reached
+    while count_avalanches < maximum_avalanches and t < max_t: # Run simulation until maximum time steps or maximum avalanches are reached
 
         random_point = np.random.randint(1, N, d) # Random point where pertubation is applied
         
