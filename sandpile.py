@@ -159,6 +159,23 @@ def run_simulation():
     pass
 
 
+def write_dissipation_to_df(list_av:list, t_avalanche:list):
+    ## find longest avalanche
+    t_max = np.max(t_avalanche)
+    
+    dict = {}
+    
+    for number, (avalanche, t) in enumerate(zip(list_av, t_avalanche)):
+        dissipation = np.zeros(t_max)
+        avalanche = np.array(avalanche)
+        dissipation[:t] = avalanche
+        dict[number] = dissipation
+        
+    return pd.DataFrame(dict)
+
+#def write_dissipation_to_txt(list_av:list):
+    
+
 
 ## data frame to store results in
 df_results = pd.DataFrame(columns = ["number", "lifetime", "total dissipation", "spatial linear size"])
@@ -166,8 +183,8 @@ df_results = pd.DataFrame(columns = ["number", "lifetime", "total dissipation", 
 ## input values
 N = 10
 crit_val = 3
-t_max = 2e7
-d=2
+t_max = 2e6
+d = 2
 tag = '20241103'
 ## settings for the algorithm
 use_abs_value = True
@@ -189,12 +206,13 @@ file_for_simulation_data = 'simulation_data'
 pbar = tqdm(total = t_max, desc ="Running Simulation")
 
 crit_grid_sum = set_up_grid(N, d)
+list_avalanches = []
 
 while t < t_max:
     ## choose point where the perturbation occurs    
     #px = np.random.randint(1, N)
     #py = np.random.randint(1, N)
-    p = np.random.randint(1,N, d)
+    p = np.random.randint(1, N, d)
     
     pert_grid[tuple(p)] +=1
     
@@ -207,10 +225,15 @@ while t < t_max:
     
     t_pre = t
     crit_grid = set_up_grid(N, d)  ## grid that shows all points for which z > z_crit during one avalanche
+    
+    
+    dissipation_tau = []
     while np.any(z):
         
-        crit_grid[z] += 1   ## increase all points where z > z_crit in an empty grid / the previous grid
+        crit_grid_tau = set_up_grid(N, d)
+        crit_grid_tau[z] += 1   ## increase all points where z > z_crit in an empty grid / the previous grid
         
+        crit_grid += crit_grid_tau
         
         grid = relax(grid, N, crit_val, boundary_condition = boundary_condition, use_abs_val=use_abs_value, d=d)  ## relax the grid
         
@@ -219,13 +242,16 @@ while t < t_max:
         else:
             z = grid > crit_val
             
+        dissipation_tau.append(np.sum(crit_grid_tau))    
+        
         t +=1
+        
         pbar.update(1)
         means.append(np.mean(grid))
         
         crit_grid_sum += crit_grid
-        
-        
+    
+    
     t_post = t 
     
 
@@ -236,6 +262,7 @@ while t < t_max:
         n_avalanche.append(n)
         total_dissipation.append(np.sum(crit_grid))
         distance.append(spatial_linear_distance(crit_grid, p=p, d=d))
+        list_avalanches.append(dissipation_tau)
   
     ## plot heatmaps of the crit_grid of avalanches with lifetimes larger than some value  
     #if t_post - t_pre > 40:  
@@ -250,6 +277,14 @@ while t < t_max:
     pbar.update(1)
 
 pbar.close()
+
+#df_avalanches = write_dissipation_to_df(list_avalanches, t_avalanche)
+
+#df_avalanches.to_csv(f'simulation_avalanche_dissipation/dissipation_sim_{type}_{boundary_condition}.csv', index=False, sep=';')
+#np.save(f'simulation_avalanche_dissipation/dissipation_sim_{type}_{boundary_condition}.npy', np.array(list_avalanches))
+with open(f'simulation_avalanche_dissipation/dissipation_sim_{type}_{boundary_condition}_{d}.txt', 'w') as f:
+    for line in list_avalanches:
+        f.write(f'{line} \n')
 
 #sns.heatmap(crit_grid_sum, norm=LogNorm())
 #plt.text(95, 5, f'perturbation = {type} \n boundary = {boundary_condition} ', ha='right', va='top', color='white')
