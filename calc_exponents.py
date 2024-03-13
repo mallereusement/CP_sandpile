@@ -11,6 +11,7 @@ from tqdm import tqdm
 
 fit_functions = static_definitions.exponent_functions()
 
+keys_of_fit_functions = ['P_of_S', 'P_of_T', 'P_of_L', 'E_of_S_T', 'E_of_T_S', 'E_of_S_L', 'E_of_L_S', 'E_of_T_L', 'E_of_L_T']
 
 def conditional_expectation_value(variable: str, condition: str, bins: np.ndarray, df: pd.DataFrame, x_limit: list=[], get_error_with_bootstrapping: bool=False):
     """calculates the conditional expectation value E(variable|condition)
@@ -265,6 +266,33 @@ def load_simulation_data(sim_data: dict) -> pd.DataFrame:
     """
     file = f"results_{sim_data['type']}_{sim_data['boundary_condition']}.csv"
     return pd.read_csv(file, sep=';', encoding='utf8')
+
+
+def get_bins_from_parameter_settings(start_bin: int, end_bin: int, bin_width: int):
+     return np.linspace(start_bin, end_bin, int(end_bin-start_bin) / bin_width)
+
+
+fit_funtion_mapping = {
+    'P_of_S': ['total dissipation', '-'],
+    'P_of_T': ['lifetime', '-'],
+    'P_of_L': ['spatial linear size', '-'],
+    'E_of_S_T': ['total dissipation', 'lifetime'],
+    'E_of_T_S': ['lifetime', 'total dissipation'],
+    'E_of_S_L': ['total dissipation', 'spatial linear size'],
+    'E_of_L_S': ['spatial linear size', 'total dissipation'],
+    'E_of_T_L': ['lifetime', 'spatial linear size'],
+    'E_of_L_T': ['spatial linear size', 'lifetime']
+}
+
+def run_calculation(fit_function: str, bootrstrap_size: int, bins: np.ndarray, df: pd.DataFrame):
+    if fit_funtion_mapping[fit_function][1] == '-':
+        result = get_exponent_from_simulation_data(fit_function, bins, df, fit_funtion_mapping[fit_function][0], bootrstrap_size)
+
+    else:
+        result = get_exponent_from_simulation_data_conditional_exp_value(fit_function, bins, df, fit_funtion_mapping[fit_function][0], fit_funtion_mapping[fit_function][1], bootrstrap_size)
+        
+
+
 
 if __name__ == '__main__':
     keys_of_fit_functions = ['P_of_S', 'P_of_T', 'P_of_L', 'E_of_S_T', 'E_of_T_S', 'E_of_S_L', 'E_of_L_S', 'E_of_T_L', 'E_of_L_T']

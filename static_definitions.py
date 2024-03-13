@@ -32,6 +32,9 @@ class exponent_functions():
     def E_of_L_T(self, x, amp, exponent):
         return amp * np.power(x, 1 / exponent)
     
+    def S_of_f(self, x, amp, exponent):
+        return amp * np.power(x, 1 / exponent)
+    
     def __getitem__(self, name):
         return getattr(self, name)
     
