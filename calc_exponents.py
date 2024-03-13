@@ -9,8 +9,6 @@ from uncertainties import unumpy as unp
 from tqdm import tqdm
 
 
-keys_of_fit_functions = ['P_of_S', 'P_of_T', 'P_of_L', 'E_of_S_T', 'E_of_T_S', 'E_of_S_L', 'E_of_L_S', 'E_of_T_L', 'E_of_L_T']
-
 fit_functions = static_definitions.exponent_functions()
 
 
@@ -269,7 +267,9 @@ def load_simulation_data(sim_data: dict) -> pd.DataFrame:
     return pd.read_csv(file, sep=';', encoding='utf8')
 
 if __name__ == '__main__':
+    keys_of_fit_functions = ['P_of_S', 'P_of_T', 'P_of_L', 'E_of_S_T', 'E_of_T_S', 'E_of_S_L', 'E_of_L_S', 'E_of_T_L', 'E_of_L_T']
 
+    
 
     #### To Do #####
     ## exponent calculation for power spectrum
