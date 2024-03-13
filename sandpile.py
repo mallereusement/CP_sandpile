@@ -181,7 +181,7 @@ def write_dissipation_to_df(list_av:list, t_avalanche:list):
 df_results = pd.DataFrame(columns = ["number", "lifetime", "total dissipation", "spatial linear size"])
 
 ## input values
-N = 10
+N = 40
 crit_val = 3
 t_max = 2e6
 d = 2
@@ -300,13 +300,22 @@ df_results.to_csv(f'{file_for_simulation_data}/results_{type}_{boundary_conditio
 
 print(df_results)
 
+def nice_plot(xdata, ydata, xlabel:str, ylabel:str, xmin, xmax, log=True):
+    plt.plot(xdata, ydata, color='black')
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.xlim(xmin, xmax)
+    if log == True:
+        plt.xscale('log')
+        plt.yscale('log')
+    plt.show()
+
 ## plot average z value of grid versus time
-plt.plot(np.arange(t)[::1000], means[::1000])
-plt.show()
-
-## plot lifetime of avalanches 
-plt.hist(t_avalanche, bins=np.arange(1000))
-plt.yscale('log')
-plt.xscale('log')
-plt.show()
-
+nice_plot(xdata=np.arange(t)*1e-5, 
+           ydata=means, 
+           xlabel='t/$10^5$', 
+           ylabel='<z>', 
+           xmin=0,
+           xmax=2,
+           log=False)
+plt.savefig(f'plots/z_mean_{type}_{boundary_condition}.png')
