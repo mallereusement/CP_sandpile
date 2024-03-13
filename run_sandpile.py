@@ -30,18 +30,19 @@ def save_simulation_parameters(filepath:str, parameters: dict) -> None:
     with open(filepath, 'w') as json_file:
         json.dump(parameters, json_file, indent=4)
 
-format_int = ['dimension', 'size of grid', 'crititcal value of z', 'number of activated avalanches', 'maximum time steps']
-format_bool = ['use absolute value', 'save file for power spectrum calculation', 'save file for exponent calculation', 'save mean value of grid']
+format_int = ['dimension', 'size of grid', 'crititcal value of z', 'number of activated avalanches', 'maximum time steps', 'steady state']
+format_bool = ['use absolute value', 'save file for power spectrum calculation', 'save file for exponent calculation', 'save mean value of grid', 'track avalanches after steady state']
 
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
     parser.add_argument("path", type=str, help="name of folder where the simulated data gets stored")
+    parser.add_argument("simulation_paramter_file", type=str, help="name of file with simulation parameters")
     args = parser.parse_args()
 
-    file_path = "simulation_parameter.txt"
-    simulation_parameters = read_simulation_parameters(file_path, format_int, format_bool)
     filepath_datastorage = args.path
+    file_path = args.simulation_paramter_file
+    simulation_parameters = read_simulation_parameters(file_path, format_int, format_bool)
     os.mkdir('./' + args.path)
 
     for parameter in simulation_parameters:

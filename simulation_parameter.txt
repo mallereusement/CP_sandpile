@@ -1,106 +1,100 @@
 - setting01
-    - name: 2d-non_conservative-N40-abs_True_z4
+    - name: 2d-non_conservative-N40-abs_True_z4-closed
     - dimension:   2
     - size of grid: 40
     - crititcal value of z: 4
     - pertubation mechanism: non_conservative
     - boundary condition: closed
     - use absolute value: True
-    - number of activated avalanches: 30000
+    - number of activated avalanches: 50000
     - maximum time steps: 20000000
+    - track avalanches after steady state: False
+    - steady state: 10000
     - save file for power spectrum calculation: True
     - save file for exponent calculation: True
-    - save mean value of grid: False
+    - save mean value of grid: True
+
 
 - setting02
-    - name: 3d-non_conservative-N20-abs_True_z4
+    - name: 3d-non_conservative-N20-abs_True_z4-closed
     - dimension:   3
     - size of grid: 20
     - crititcal value of z: 4
     - pertubation mechanism: non_conservative
     - boundary condition: closed
     - use absolute value: True
-    - number of activated avalanches: 30000
+    - number of activated avalanches: 50000
     - maximum time steps: 20000000
+    - track avalanches after steady state: False
+    - steady state: 18000
     - save file for power spectrum calculation: True
     - save file for exponent calculation: True
-    - save mean value of grid: False
+    - save mean value of grid: True
 
 - setting03
-    - name: 4d-non_conservative-N20-abs_True_z4
+    - name: 4d-non_conservative-N20-abs_True_z4-closed
     - dimension:   4
     - size of grid: 20
     - crititcal value of z: 4
     - pertubation mechanism: non_conservative
     - boundary condition: closed
     - use absolute value: True
-    - number of activated avalanches: 30000
+    - number of activated avalanches: 50000
     - maximum time steps: 20000000
+    - track avalanches after steady state: False
+    - steady state: 400000
     - save file for power spectrum calculation: True
     - save file for exponent calculation: True
-    - save mean value of grid: False
-
-
-
-- setting04
-    - name: 5d-non_conservative-N20-abs_True_z4
-    - dimension:   5
-    - size of grid: 15
-    - crititcal value of z: 4
-    - pertubation mechanism: non_conservative
-    - boundary condition: closed
-    - use absolute value: True
-    - number of activated avalanches: 30000
-    - maximum time steps: 20000000
-    - save file for power spectrum calculation: True
-    - save file for exponent calculation: True
-    - save mean value of grid: False
-
-
-
+    - save mean value of grid: True
 
 
 - setting05
-    - name: 2d-non_conservative-N40-abs_True_z4
+    - name: 2d-non_conservative-N40-abs_True_z4-open
     - dimension:   2
     - size of grid: 40
     - crititcal value of z: 4
     - pertubation mechanism: non_conservative
     - boundary condition: open
     - use absolute value: True
-    - number of activated avalanches: 30000
+    - number of activated avalanches: 50000
     - maximum time steps: 20000000
+    - track avalanches after steady state: False
+    - steady state: 15000
     - save file for power spectrum calculation: True
     - save file for exponent calculation: True
-    - save mean value of grid: False
+    - save mean value of grid: True
 
 - setting06
-    - name: 3d-non_conservative-N20-abs_True_z4
+    - name: 3d-non_conservative-N20-abs_True_z4-open
     - dimension:   3
     - size of grid: 20
     - crititcal value of z: 4
     - pertubation mechanism: non_conservative
     - boundary condition: open
     - use absolute value: True
-    - number of activated avalanches: 30000
+    - number of activated avalanches: 50000
     - maximum time steps: 20000000
+    - track avalanches after steady state: False
+    - steady state: 20000
     - save file for power spectrum calculation: True
     - save file for exponent calculation: True
-    - save mean value of grid: False
+    - save mean value of grid: True
 
 - setting07
-    - name: 4d-non_conservative-N20-abs_True_z4
+    - name: 4d-non_conservative-N20-abs_True_z4-open
     - dimension:   4
     - size of grid: 20
     - crititcal value of z: 4
     - pertubation mechanism: non_conservative
     - boundary condition: open
     - use absolute value: True
-    - number of activated avalanches: 30000
+    - number of activated avalanches: 50000
     - maximum time steps: 20000000
+    - track avalanches after steady state: False
+    - steady state: 360000
     - save file for power spectrum calculation: True
     - save file for exponent calculation: True
-    - save mean value of grid: False
+    - save mean value of grid: True
 
 
 
@@ -108,44 +102,49 @@
 
 
 - setting08
-    - name: 2d-non_conservative-N40-abs_True_z4
+    - name: 2d-conservative-N40-abs_True_z4-open
     - dimension:   2
     - size of grid: 40
     - crititcal value of z: 4
     - pertubation mechanism: conservative
     - boundary condition: open
     - use absolute value: True
-    - number of activated avalanches: 30000
+    - number of activated avalanches: 100000
     - maximum time steps: 20000000
+    - track avalanches after steady state: False
+    - steady state: 500000
     - save file for power spectrum calculation: True
     - save file for exponent calculation: True
-    - save mean value of grid: False
+    - save mean value of grid: True
 
 - setting09
-    - name: 3d-non_conservative-N20-abs_True_z4
+    - name: 3d-conservative-N20-abs_True_z4-open
     - dimension:   3
     - size of grid: 20
     - crititcal value of z: 4
     - pertubation mechanism: conservative
     - boundary condition: open
     - use absolute value: True
-    - number of activated avalanches: 30000
+    - number of activated avalanches: 100000
     - maximum time steps: 20000000
+    - track avalanches after steady state: False
+    - steady state: 400000
     - save file for power spectrum calculation: True
     - save file for exponent calculation: True
-    - save mean value of grid: False
+    - save mean value of grid: True
 
 - setting10
-    - name: 4d-non_conservative-N20-abs_True_z4
+    - name: 4d-conservative-N20-abs_True_z4-open
     - dimension:   4
     - size of grid: 20
     - crititcal value of z: 4
     - pertubation mechanism: conservative
     - boundary condition: open
     - use absolute value: True
-    - number of activated avalanches: 30000
+    - number of activated avalanches: 100000
     - maximum time steps: 20000000
+    - track avalanches after steady state: False
+    - steady state: 1000000
     - save file for power spectrum calculation: True
     - save file for exponent calculation: True
-    - save mean value of grid: False
-
+    - save mean value of grid: True
