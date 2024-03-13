@@ -1,18 +1,10 @@
 import numpy as np
 import pandas as pd
-import static_definitions
-from iminuit.cost import LeastSquares
-from iminuit import Minuit
-import uncertainties as unc
 import matplotlib.pyplot as plt
-from uncertainties import unumpy as unp
 from tqdm import tqdm
 from scipy.fft import fft, ifft
 
-type = 'non_conservative'
-boundary_condition = 'closed'
-d = 2
-d_list = [2]
+
 
 def load_data(filename: str):
     file  = open(f'{filename}', 'r')
@@ -59,7 +51,10 @@ def calculate_power_spectrum(max_length, R, T, N, l):
 
 
 if __name__ == '__main__':       
-
+    type = 'non_conservative'
+    boundary_condition = 'closed'
+    d = 2
+    d_list = [2]
     
     for d in d_list:
 

@@ -1,33 +1,11 @@
 - setting01
     - name: 2d-non_conservative-N40-abs_True_z4-closed
     - fit functions: [P_of_S, P_of_T, P_of_L, E_of_S_T, E_of_T_S, E_of_S_L, E_of_L_S, E_of_T_L, E_of_L_T, S_of_f]
-    - start bins: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-    - end bins: [10, 10, 10, 10, 10, 10, 10, 10, 10, 10]
+    - start bins: [10, 10, 10, 10, 10, 10, 10, 10, 10, 1]
+    - end bins: [500, 200, 60, 400, 400, 20, 400, 20, 100, 10]
     - bin width: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
     - save plots: False
-    - power spectrum R: 1
-    - power spectrum T: 1
-    - power spectrum N: 1
-
-- setting02
-    - name: 3d-non_conservative-N20-abs_True_z4-closed
-    - fit functions: [P_of_S, P_of_T, P_of_L, E_of_S_T, E_of_T_S, E_of_S_L, E_of_L_S, E_of_T_L, E_of_L_T, S_of_f]
-    - start bins: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-    - end bins: [10, 10, 10, 10, 10, 10, 10, 10, 10, 10]
-    - bin width: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-    - save plots: False
-    - power spectrum R: 1
-    - power spectrum T: 1
-    - power spectrum N: 1
-
-
-- setting03
-    - name: 4d-non_conservative-N20-abs_True_z4-closed
-    - fit functions: [P_of_S, P_of_T, P_of_L, E_of_S_T, E_of_T_S, E_of_S_L, E_of_L_S, E_of_T_L, E_of_L_T, S_of_f]
-    - start bins: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-    - end bins: [10, 10, 10, 10, 10, 10, 10, 10, 10, 10]
-    - bin width: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-    - save plots: False
-    - power spectrum R: 1
-    - power spectrum T: 1
-    - power spectrum N: 1
+    - power spectrum R: 10
+    - power spectrum T: 100
+    - power spectrum N: 1000
+    - bootstrap size: 100
