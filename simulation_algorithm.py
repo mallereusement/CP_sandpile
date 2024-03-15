@@ -247,18 +247,14 @@ def run_simulation(simulation_parameter: dict, filepath_datastorage: str, simula
     t = 0 # Initialize time tracker
     count_avalanches = 0 # Track number of triggered avalanches
 
-
-
-    while count_avalanches < maximum_avalanches and t < max_t: # Run simulation until maximum time steps or maximum avalanches are reached
-
-        if track_after_steady_state:
-            if t > steady_state:
-                reached_steady_state = True
-                c = c + 1
-            if reached_steady_state and c == 1:
-                c = 2
-                pbar1.set_description(f"Running Simulation {simulation_name}: Steady state reached after t={t}, Number of activated avalances")
-                pbar1.refresh()
+    while (count_avalanches < maximum_avalanches) and (t < max_t): # Run simulation until maximum time steps or maximum avalanches are reached
+        if c < 2:
+            if track_after_steady_state:
+                if t > steady_state:
+                    reached_steady_state = True
+                    c = 2
+                    pbar1.set_description(f"Running Simulation {simulation_name}: Steady state reached after t={t}, Number of activated avalances")
+                    pbar1.refresh()
 
         random_point = np.random.randint(1, N, d) # Random point where pertubation is applied
         
@@ -344,7 +340,6 @@ def run_simulation(simulation_parameter: dict, filepath_datastorage: str, simula
         pbar2.update(1)
     pbar2.close()
     pbar1.close()
-    print('\n')
 
     #### Save Data ####
     if simulation_parameter['save file for exponent calculation']:
