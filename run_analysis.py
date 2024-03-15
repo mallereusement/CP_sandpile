@@ -2,11 +2,11 @@ import calc_exponents
 import run_sandpile
 import argparse
 import os
-import json
 import pandas as pd
 import power_spectrum
 import numpy as np
 import matplotlib.pyplot as plt
+import plotting
 
 def read_analysis_parameters(file_path, format_bool, format_list, format_int) -> dict:
     parameters = {}
@@ -20,7 +20,7 @@ def read_analysis_parameters(file_path, format_bool, format_list, format_int) ->
             elif ':' in line:
                 key = line.split(':', 1)[0][2:]
                 value = line.split(':', 1)[1]
-                if key == 'fit functions':
+                if key in format_list_str:
                     parameters[current_setting][key.strip()] = value.strip().strip('][').split(', ')
                 elif key in format_int:
                     parameters[current_setting][key.strip()] = int(float(value.strip()))
@@ -35,55 +35,84 @@ def read_analysis_parameters(file_path, format_bool, format_list, format_int) ->
                     parameters[current_setting][key.strip()] = value.strip()
     return parameters
 
-def plot_power_spectrum(freq, power_spectrum):
-    plt.plot(np.log(freq), np.log(power_spectrum), color='black')
-    plt.xlabel('$log(f)$')
-    plt.ylabel('$log(S(f))$')
-    
-    plt.tight_layout()
-    plt.savefig(f"exponent_calculation/plots/S_of_f.jpg", dpi=300)
-    plt.show()
-    return 
-    
+
 
 format_bool = ['save plots']
 format_list = ['start bins', 'end bins', 'bin width']
-format_int = ['power spectrum R', 'power spectrum T', 'power spectrum N']
+format_int = ['power spectrum R', 'power spectrum T', 'power spectrum N', 'bootstrap size']
+format_list_str = ['fit functions', 'xlabels']
 
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
     parser.add_argument("path", type=str, help="name of folder where the simulated data gets stored")
-    parser.add_argument("simulation_paramter_file", type=str, help="name of file with analysis parameters")
+    parser.add_argument("analysis_parameter_file", type=str, help="name of file with analysis parameters")
     args = parser.parse_args()
 
     filepath_datastorage = args.path
-    file_path = args.simulation_paramter_file
-    simulation_parameters = read_analysis_parameters(file_path, format_bool, format_list, format_int)
+    file_path = args.analysis_parameter_file
+    analysis_parameters = read_analysis_parameters(file_path, format_bool, format_list, format_int)
     
+    if analysis_parameters['setting01']['save plots']:
+        ## load data for z-means:
+        means_df = pd.read_csv(f'{filepath_datastorage}/{analysis_parameters["setting01"]["name"]}/simulation_data/data_mean.csv', sep=';', encoding='utf8')
+        means = means_df['mean'].to_numpy()
+        times = means_df['time'].to_numpy()
+        
+        plotting.nice_plot(times*1e-5, means, 't/$10^5$', '<z>', xmin=-0.01, xmax=2,  log=False)
+        plt.savefig('./' + f'{filepath_datastorage}/{analysis_parameters["setting01"]["name"]}/plots/z_means.jpg', dpi=300)
 
-    for parameter in simulation_parameters:
-        print(simulation_parameters[parameter]['fit functions'])
-        if 'S_of_f' in simulation_parameters[parameter]['fit functions']:
-            l, len_avalanche = power_spectrum.load_data(f'{filepath_datastorage}/{simulation_parameters[parameter]["name"]}/simulation_data/data_for_power_spectrum_calculation.txt')
+    
+    for parameter in analysis_parameters:
+
+        run_sandpile.save_simulation_parameters('./' + f'{filepath_datastorage}/{analysis_parameters[parameter]["name"]}/analysis_parameter', analysis_parameters[parameter])
+        #os.mkdir('./' + f'{filepath_datastorage}/{analysis_parameters[parameter]["name"]}/results')
+
+        #if analysis_parameters[parameter]['save plots']:
+            #os.mkdir('./' + f'{filepath_datastorage}/{analysis_parameters[parameter]["name"]}/plots')
+
+
+        if 'S_of_f' in analysis_parameters[parameter]['fit functions']:
+            l, len_avalanche = power_spectrum.load_data(f'{filepath_datastorage}/{analysis_parameters[parameter]["name"]}/simulation_data/data_for_power_spectrum_calculation.txt')
             max_length = np.max(np.array(len_avalanche))
-            R = simulation_parameters[parameter]['power spectrum R']
-            N = simulation_parameters[parameter]['power spectrum N']
-            T = simulation_parameters[parameter]['power spectrum T']
-            power_spectrum, freq = power_spectrum.calculate_power_spectrum(max_length, R, T, N, l)
-            idx = simulation_parameters[parameter]['fit functions'].index('S_of_f')
+            R = analysis_parameters[parameter]['power spectrum R']
+            N = analysis_parameters[parameter]['power spectrum N']
+            T = analysis_parameters[parameter]['power spectrum T']
+            power_spectrum_, freq = power_spectrum.calculate_power_spectrum(max_length, R, T, N, l)
+            df_power_spectrum = pd.DataFrame({'frequency': freq, 'power spectrum': power_spectrum_})
+            df_power_spectrum.to_csv(f'{filepath_datastorage}/{analysis_parameters[parameter]["name"]}/results/power_spectrum.csv', sep=';', encoding='utf8', index=False)
+            idx = analysis_parameters[parameter]['fit functions'].index('S_of_f')
+            # To Do: Exponent calculation
+            if analysis_parameters[parameter]['save plots']:
+                
+                plotting.nice_plot(freq, power_spectrum_, 'f', 'S(f)', -4, 0)
+                plt.savefig('./' + f'{filepath_datastorage}/{analysis_parameters[parameter]["name"]}/plots/S_of_f.jpg', dpi=300)
+
+                
             
-            if simulation_parameters[parameter]['save plots']:
-                plot_power_spectrum(freq, power_spectrum)
-            
 
 
-        if (set(simulation_parameters[parameter]['fit functions']) & set(calc_exponents.keys_of_fit_functions)):
-            df = pd.read_csv(f'{filepath_datastorage}/{simulation_parameters[parameter]["name"]}/simulation_data/data_for_exponent_calculation.csv', sep=';', encoding='utf8')
-
-            #for i in range(len(simulation_parameters[parameter]['fit functions'])):
-            #if i != idx:
-            #    result = 
-
-    
+        if (set(analysis_parameters[parameter]['fit functions']) & set(calc_exponents.keys_of_fit_functions)):
+            df = pd.read_csv(f'{filepath_datastorage}/{analysis_parameters[parameter]["name"]}/simulation_data/data_for_exponent_calculation.csv', sep=';', encoding='utf8')
+            file_count = False
+            file_name_exponent_calculation = f'{filepath_datastorage}/{analysis_parameters[parameter]["name"]}/results/results.csv'
+            for i in range(len(analysis_parameters[parameter]['fit functions'])):
+                if i != idx:
+                    bin_start = analysis_parameters[parameter]['start bins'][i]
+                    bin_end = analysis_parameters[parameter]['end bins'][i]
+                    bin_width = analysis_parameters[parameter]['bin width'][i]
+                    bins = [bin_start, bin_end, bin_width]
+                    result = calc_exponents.run_calculation(analysis_parameters[parameter]['fit functions'][i], analysis_parameters[parameter]['bootstrap size'], bins, df)
+                    
+                    if analysis_parameters[parameter]['save plots']:
+                        plotting.plot_conditional_exponents(result, analysis_parameters[parameter], i)
+                        plt.savefig('./' + f'{filepath_datastorage}/{analysis_parameters[parameter]["name"]}/plots/{analysis_parameters[parameter]["fit functions"][i]}.jpg', dpi=300)
+                    
+                    
+                    if not file_count:
+                        calc_exponents.save_exponent_data(analysis_parameters[parameter]['fit functions'][i], bins, analysis_parameters[parameter]['bootstrap size'], result, file_name_exponent_calculation, file_to_load=False)
+                        file_count = True
+                    elif file_count:
+                        calc_exponents.save_exponent_data(analysis_parameters[parameter]['fit functions'][i], bins, analysis_parameters[parameter]['bootstrap size'], result, file_name_exponent_calculation, file_to_load=file_name_exponent_calculation)
+        
     

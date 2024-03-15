@@ -103,8 +103,11 @@ def exclude_outside_interval(bin_edges: np.ndarray, histogram_data: np.ndarray, 
         return truncated_bin_edges
 
 
-def get_exponent_from_simulation_data_power_spectrum() -> dict: # ToDo
+def get_exponent_from_simulation_data_power_spectrum(fit_function: str, bins: np.ndarray, df: pd.DataFrame, bootstrap_size: int, x_limit: list=[], starting_values: list = [1, 1]) -> dict: # ToDo
     pass
+    #samples = generate_bootstrap_samples(df, bootstrap_size)
+
+
 
 
 def get_exponent_from_simulation_data_conditional_exp_value(fit_function: str, bins: np.ndarray, df: pd.DataFrame, variable: str, condition: str, bootstrap_size: int, x_limit: list=[], starting_values: list = [1, 1]) -> dict: # ToDo
@@ -224,7 +227,7 @@ def fit_data(fit_function: str, x:np.ndarray, data: np.ndarray, errors: np.ndarr
     m.migrad()
     return m
 
-def save_exponent_data(simulation_parameters: dict, analysis_parameters: dict, fit_parameter: dict, fit_results: dict, file_to_save, file_to_load=False) -> None:
+def save_exponent_data(fit_function: str, bins: dict, bootstrap_size: str, fit_results: dict, file_to_save, file_to_load=False) -> None:
     """_summary_
 
     Args:
@@ -235,18 +238,18 @@ def save_exponent_data(simulation_parameters: dict, analysis_parameters: dict, f
         file_to_save (_type_): _description_
         file_to_load (bool, optional): _description_. Defaults to False.
     """
-    if fit_parameter['x_limit']:
-        bins_start = fit_parameter['x_limit'][0]
-        bins_end = fit_parameter['x_limit'][1]
-        min_index = np.searchsorted(fit_parameter['bins'], bins_start, side='left')
-        max_index = np.searchsorted(fit_parameter['bins'], bins_end, side='right')
-        bins_count = len(fit_parameter['bins'][min_index:max_index])
-    else:
-        bins_start = fit_parameter['bins'][0]
-        bins_end = fit_parameter['bins'][-1]       
-        bins_count = len(fit_parameter['bins'])
-
-    temp_df = pd.DataFrame({'boundary condition': [simulation_parameters['boundary_condition']], 'pertubation mechanism': [simulation_parameters['type']], 'fit function': [analysis_parameters['fit_function']], 'variable': [analysis_parameters['variable']], 'condition': [analysis_parameters['condition']], 'left bin edge': [bins_start], 'right bin edge': [bins_end], 'count of bins': [bins_count], 'bootstrap size': [fit_parameter['bootstrap_size']], 'amplitude from fit result': [fit_results['parameters'][0]], 'exponent from fit result': [fit_results['parameters'][1]], 'covariance c_11': [fit_results['covariance_matrix'][0,0]], 'covariance c_12': [fit_results['covariance_matrix'][0,1]], 'covariance c_22': [fit_results['covariance_matrix'][1,1]]})
+    #if fit_parameter['x_limit']:
+    #    bins_start = fit_parameter['x_limit'][0]
+    #    bins_end = fit_parameter['x_limit'][1]
+    #    min_index = np.searchsorted(fit_parameter['bins'], bins_start, side='left')
+    #    max_index = np.searchsorted(fit_parameter['bins'], bins_end, side='right')
+    #    bins_count = len(fit_parameter['bins'][min_index:max_index])
+    #else:
+    #    bins_start = fit_parameter['bins'][0]
+    #    bins_end = fit_parameter['bins'][-1]       
+    #    bins_count = len(fit_parameter['bins'])
+    bins = get_bins_from_parameter_settings(*bins)
+    temp_df = pd.DataFrame({'fit function': [fit_function], 'variable': [fit_funtion_mapping[fit_function][0]], 'condition': [fit_funtion_mapping[fit_function][1]], 'left bin edge': [bins[0]], 'right bin edge': [bins[-1]], 'count of bins': [len(bins)-1], 'bootstrap size': [bootstrap_size], 'amplitude from fit result': [fit_results['parameters'][0]], 'exponent from fit result': [fit_results['parameters'][1]], 'covariance c_11': [fit_results['covariance_matrix'][0,0]], 'covariance c_12': [fit_results['covariance_matrix'][0,1]], 'covariance c_22': [fit_results['covariance_matrix'][1,1]]})
     
     if not file_to_load:
         temp_df.to_csv(file_to_save, sep=';', encoding='utf8', index=False)
@@ -269,10 +272,11 @@ def load_simulation_data(sim_data: dict) -> pd.DataFrame:
 
 
 def get_bins_from_parameter_settings(start_bin: int, end_bin: int, bin_width: int):
-     return np.linspace(start_bin, end_bin, int(end_bin-start_bin) / bin_width)
+     return np.linspace(start_bin, end_bin, int((end_bin-start_bin) / float(bin_width)))
 
 
 fit_funtion_mapping = {
+    'S_of_f': ['power spectrum', '-'],
     'P_of_S': ['total dissipation', '-'],
     'P_of_T': ['lifetime', '-'],
     'P_of_L': ['spatial linear size', '-'],
@@ -284,14 +288,31 @@ fit_funtion_mapping = {
     'E_of_L_T': ['spatial linear size', 'lifetime']
 }
 
-def run_calculation(fit_function: str, bootrstrap_size: int, bins: np.ndarray, df: pd.DataFrame):
+def run_calculation(fit_function: str, bootrstrap_size: int, bins: list, df: pd.DataFrame):
+    """ Function takes the fit function and automatically decided which exponent should get calculated
+
+    Args:
+        fit_function (str): name of fit function of exponent
+        bootrstrap_size (int): size of bootstrap for error calculation of fit
+        bins (list): [start bin, end bin, width of bin]
+        df (pd.DataFrame): simulated data
+
+    Returns:
+        _type_: fit results
+    """
+    bins = get_bins_from_parameter_settings(*bins)
     if fit_funtion_mapping[fit_function][1] == '-':
-        result = get_exponent_from_simulation_data(fit_function, bins, df, fit_funtion_mapping[fit_function][0], bootrstrap_size)
+        if fit_function == 'S_of_f':
+            result = get_exponent_from_simulation_data_power_spectrum() # To Do
+        else:
+            result = get_exponent_from_simulation_data(fit_function, bins, df, fit_funtion_mapping[fit_function][0], bootrstrap_size)
 
     else:
         result = get_exponent_from_simulation_data_conditional_exp_value(fit_function, bins, df, fit_funtion_mapping[fit_function][0], fit_funtion_mapping[fit_function][1], bootrstrap_size)
-        
+    return result
 
+def calculate_products_of_exponents():
+    pass
 
 
 if __name__ == '__main__':
