@@ -40,7 +40,7 @@ def read_analysis_parameters(file_path, format_bool, format_list, format_int) ->
 format_bool = ['save plots']
 format_list = ['start bins', 'end bins', 'bin width']
 format_int = ['power spectrum R', 'power spectrum T', 'power spectrum N', 'bootstrap size']
-format_list_str = ['fit functions', 'xlabels']
+format_list_str = ['fit functions', 'xlabels', 'ylabels']
 
 if __name__ == '__main__':
 
@@ -53,23 +53,27 @@ if __name__ == '__main__':
     file_path = args.analysis_parameter_file
     analysis_parameters = read_analysis_parameters(file_path, format_bool, format_list, format_int)
     
-    if analysis_parameters['setting01']['save plots']:
-        ## load data for z-means:
-        means_df = pd.read_csv(f'{filepath_datastorage}/{analysis_parameters["setting01"]["name"]}/simulation_data/data_mean.csv', sep=';', encoding='utf8')
-        means = means_df['mean'].to_numpy()
-        times = means_df['time'].to_numpy()
-        
-        plotting.nice_plot(times*1e-5, means, 't/$10^5$', '<z>', xmin=-0.01, xmax=2,  log=False)
-        plt.savefig('./' + f'{filepath_datastorage}/{analysis_parameters["setting01"]["name"]}/plots/z_means.jpg', dpi=300)
-
     
-    for parameter in analysis_parameters:
+    
+    for parameter in analysis_parameters:            
+            
+        if analysis_parameters[parameter]['save plots']:
+            os.mkdir('./' + f'{filepath_datastorage}/{analysis_parameters[parameter]["name"]}/plots')  ## create folder to store plots 
+            
+            ## load data for z-means:
+            means_df = pd.read_csv(f'{filepath_datastorage}/{analysis_parameters[parameter]["name"]}/simulation_data/data_mean.csv', sep=';', encoding='utf8')
+            means = means_df['mean'].to_numpy()
+            times = means_df['time'].to_numpy()
+
+            ## plot z-means and save plot
+            plotting.nice_plot(times*1e-5, means, 't/$10^5$', '<z>', xmin=-0.01, xmax=2,  log=False)
+            plt.savefig('./' + f'{filepath_datastorage}/{analysis_parameters[parameter]["name"]}/plots/z_means.jpg', dpi=300)
+
 
         run_sandpile.save_simulation_parameters('./' + f'{filepath_datastorage}/{analysis_parameters[parameter]["name"]}/analysis_parameter', analysis_parameters[parameter])
-        #os.mkdir('./' + f'{filepath_datastorage}/{analysis_parameters[parameter]["name"]}/results')
+        os.mkdir('./' + f'{filepath_datastorage}/{analysis_parameters[parameter]["name"]}/results')
 
-        #if analysis_parameters[parameter]['save plots']:
-            #os.mkdir('./' + f'{filepath_datastorage}/{analysis_parameters[parameter]["name"]}/plots')
+        
 
 
         if 'S_of_f' in analysis_parameters[parameter]['fit functions']:
@@ -84,7 +88,7 @@ if __name__ == '__main__':
             idx = analysis_parameters[parameter]['fit functions'].index('S_of_f')
             # To Do: Exponent calculation
             if analysis_parameters[parameter]['save plots']:
-                
+                ## plot power spectrum and save plot
                 plotting.nice_plot(freq, power_spectrum_, 'f', 'S(f)', -4, 0)
                 plt.savefig('./' + f'{filepath_datastorage}/{analysis_parameters[parameter]["name"]}/plots/S_of_f.jpg', dpi=300)
 
@@ -105,6 +109,7 @@ if __name__ == '__main__':
                     result = calc_exponents.run_calculation(analysis_parameters[parameter]['fit functions'][i], analysis_parameters[parameter]['bootstrap size'], bins, df)
                     
                     if analysis_parameters[parameter]['save plots']:
+                        ## plot conditional expectation values and fit and save plots
                         plotting.plot_conditional_exponents(result, analysis_parameters[parameter], i)
                         plt.savefig('./' + f'{filepath_datastorage}/{analysis_parameters[parameter]["name"]}/plots/{analysis_parameters[parameter]["fit functions"][i]}.jpg', dpi=300)
                     

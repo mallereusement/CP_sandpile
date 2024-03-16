@@ -1,0 +1,68 @@
+{
+    "name": "3d-non_conservative-N20-abs_True_z4-closed",
+    "fit functions": [
+        "P_of_S",
+        "P_of_T",
+        "P_of_L",
+        "E_of_S_T",
+        "E_of_T_S",
+        "E_of_S_L",
+        "E_of_L_S",
+        "E_of_T_L",
+        "E_of_L_T",
+        "S_of_f"
+    ],
+    "start bins": [
+        10,
+        10,
+        10,
+        10,
+        10,
+        10,
+        10,
+        10,
+        10,
+        1
+    ],
+    "end bins": [
+        500,
+        200,
+        60,
+        400,
+        400,
+        20,
+        400,
+        20,
+        100,
+        10
+    ],
+    "bin width": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+    ],
+    "save plots": true,
+    "power spectrum R": 10,
+    "power spectrum T": 100,
+    "power spectrum N": 1000,
+    "bootstrap size": 100,
+    "xlabels": [
+        "s",
+        "$\\tau$",
+        "l",
+        "$\\tau$",
+        "s",
+        "l",
+        "s",
+        "l",
+        "$\\tau$",
+        "f"
+    ]
+}

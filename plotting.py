@@ -36,7 +36,7 @@ def plot_conditional_exponents(result: pd.DataFrame, parameter_key, index):  ###
     ax1.set_yscale('log')
     ax1.set_xscale('log')
     ax1.legend()
-    ax1.set_ylabel(parameter_key['fit functions'][index])
+    ax1.set_ylabel(parameter_key['ylabels'][index])
        
     error_ratio = (result["data"] - result["model"]) / result["errors"]
 
