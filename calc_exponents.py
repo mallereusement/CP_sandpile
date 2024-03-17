@@ -13,7 +13,7 @@ fit_functions = static_definitions.exponent_functions()
 
 keys_of_fit_functions = ['P_of_S', 'P_of_T', 'P_of_L', 'E_of_S_T', 'E_of_T_S', 'E_of_S_L', 'E_of_L_S', 'E_of_T_L', 'E_of_L_T']
 
-def conditional_expectation_value(variable: str, condition: str, bins: np.ndarray, df: pd.DataFrame, x_limit: list=[], get_error_with_bootstrapping: bool=False):
+def conditional_expectation_value(variable: str, condition: str, bins: np.ndarray, df: pd.DataFrame, x_limit: list=[], get_error_with_bootstrapping: bool=False, bootstrap_size=200):
     """calculates the conditional expectation value E(variable|condition)
 
     Args:
@@ -51,8 +51,8 @@ def conditional_expectation_value(variable: str, condition: str, bins: np.ndarra
 
 
     if get_error_with_bootstrapping:
-        pbar = tqdm(total = 1000, desc ="Running Bootstrap for Error Estimation of conditional expectation value")
-        samples = generate_bootstrap_samples(df, 1000)
+        pbar = tqdm(total = bootstrap_size, desc ="Running Bootstrap for Error Estimation of conditional expectation value")
+        samples = generate_bootstrap_samples(df, bootstrap_size)
         expectation_list_bootstrap_global = []
         for sample in samples:
             expectation_list_bootstrap = []
@@ -130,7 +130,7 @@ def get_exponent_from_simulation_data_conditional_exp_value(fit_function: str, b
 
     parameters_amp = []
     parameters_exp = []
-    x_org, data_org = conditional_expectation_value(variable, condition, bins, df, x_limit, get_error_with_bootstrapping=True)
+    x_org, data_org = conditional_expectation_value(variable, condition, bins, df, x_limit, get_error_with_bootstrapping=True, bootstrap_size=bootstrap_size)
     m_org = fit_data(fit_function, x_org, unp.nominal_values(data_org), unp.std_devs(data_org), starting_values)
 
     for sample in samples:
@@ -149,12 +149,13 @@ def get_exponent_from_simulation_data_conditional_exp_value(fit_function: str, b
     return {"parameters": [unc.ufloat(m_org.values['amp'], cov_mat[0,0]**0.5), unc.ufloat(m_org.values['exponent'], cov_mat[1,1]**0.5)], "covariance_matrix": cov_mat, "x": x, "data": unp.nominal_values(data_org), "errors": unp.std_devs(data_org), "model": fit_functions[fit_function](x, m_org.values['amp'], m_org.values['exponent']), "samples": samples}
 
 
-def generate_bootstrap_samples(data, bootstrap_size: int):
+def generate_bootstrap_samples(data, bootstrap_size: int, block_size: int=0):
     """Generate bootstrap sample of size bootstrap_size for given simulation data
 
     Args:
         data (pd.DataFrame): simulation data
         bootstrap_size (int): number of bootstrap samples
+        block_size (int): block_size for bootrstrapping because of correlation of time series
 
     Returns:
         pd.DataFrame: bootstrap_size bootstrap samples
@@ -187,15 +188,16 @@ def get_exponent_from_simulation_data(fit_function: str, bins: np.ndarray, df: p
     samples = generate_bootstrap_samples(df, bootstrap_size)
     hist_data = [np.histogram(i[variable], bins=bins)[0] for i in samples]
     samples = np.array([i for i in hist_data])
+    errors = np.std(samples, axis=0)
     parameters_amp = []
     parameters_exp = []
-    m_org = fit_data(fit_function, bin_centers, data, np.sqrt(data), starting_values)
+    m_org = fit_data(fit_function, bin_centers, data, errors, starting_values)
 
     for sample in samples:
 
         sample[sample == 0] = 1e-7 # avoid division by zero
         sample = sample.astype(np.longdouble)
-        m = fit_data(fit_function, bin_centers, sample, np.sqrt(sample), starting_values)
+        m = fit_data(fit_function, bin_centers, sample, errors, starting_values)
         if m.valid:
             parameter_amp, parameter_exp = m.values['amp'], m.values['exponent']
             parameters_amp.append(parameter_amp)
@@ -206,7 +208,7 @@ def get_exponent_from_simulation_data(fit_function: str, bins: np.ndarray, df: p
 
     cov_mat = np.cov(np.stack((parameters_amp, parameters_exp), axis = 0))
 
-    return {"parameters": [unc.ufloat(m_org.values['amp'], cov_mat[0,0]**0.5), unc.ufloat(m_org.values['exponent'], cov_mat[1,1]**0.5)], "covariance_matrix": cov_mat, "x": bin_centers, "data": data, "errors": np.sqrt(data), "model": fit_functions[fit_function](bin_centers, m_org.values['amp'], m_org.values['exponent']), "samples": samples}
+    return {"parameters": [unc.ufloat(m_org.values['amp'], cov_mat[0,0]**0.5), unc.ufloat(m_org.values['exponent'], cov_mat[1,1]**0.5)], "covariance_matrix": cov_mat, "x": bin_centers, "data": data, "errors": errors, "model": fit_functions[fit_function](bin_centers, m_org.values['amp'], m_org.values['exponent']), "samples": samples}
 
 
 def fit_data(fit_function: str, x:np.ndarray, data: np.ndarray, errors: np.ndarray, starting_values: list) -> float:
