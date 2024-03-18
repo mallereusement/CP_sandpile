@@ -7,11 +7,12 @@ import uncertainties as unc
 import matplotlib.pyplot as plt
 from uncertainties import unumpy as unp
 from tqdm import tqdm
+import math
 
 
 fit_functions = static_definitions.exponent_functions()
 
-keys_of_fit_functions = ['P_of_S', 'P_of_T', 'P_of_L', 'E_of_S_T', 'E_of_T_S', 'E_of_S_L', 'E_of_L_S', 'E_of_T_L', 'E_of_L_T']
+keys_of_fit_functions = ['P_of_S', 'P_of_T', 'P_of_L', 'E_of_S_T', 'E_of_T_S', 'E_of_S_L', 'E_of_L_S', 'E_of_T_L', 'E_of_L_T', 'gamma1_gamma3_1', 'gamma1_gamma3_2']
 
 def conditional_expectation_value(variable: str, condition: str, bins: np.ndarray, df: pd.DataFrame, x_limit: list=[], get_error_with_bootstrapping: bool=False, bootstrap_size=200):
     """calculates the conditional expectation value E(variable|condition)
@@ -107,6 +108,65 @@ def get_exponent_from_simulation_data_power_spectrum(fit_function: str, bins: np
     pass
     #samples = generate_bootstrap_samples(df, bootstrap_size)
 
+def get_exponent_product_from_simulation_data_conditional_exp_value(fit_function: str, bins1: np.ndarray, bins2: np.ndarray, df: pd.DataFrame, bootstrap_size: int, x_limit1: list=[], x_limit2: list=[], starting_values: list = [1, 1]) -> dict: # ToDo
+    """Get exponent of conditional expectation value with uncertainty for specified distribution and covariance matrix
+
+    Args:
+        fit_function (str): specified distribution
+        bins (np.ndarray): bins
+        df (pd.DataFrame): simulation data
+        variable (str): set variable you want to look at
+        condition (str): set condition you want to look at
+        bootstrap_size (int): number of bootstrap samples for error estimation
+        x_limit (list): define interval for fit. Default interval is provided by bins
+
+    Returns:
+        dict: ["parameters"] Fit parameters with errors, ["covariance_matrix"] covariance matrix
+    """
+    samples = generate_bootstrap_samples(df, bootstrap_size)
+    product = []
+
+    if fit_function == 'gamma1_gamma3_1':
+        x_org1, data_org1 = conditional_expectation_value('total dissipation', 'lifetime', bins1, df, x_limit1, get_error_with_bootstrapping=True, bootstrap_size=bootstrap_size)
+        m_org1 = fit_data(fit_function, x_org1, unp.nominal_values(data_org1), unp.std_devs(data_org1), starting_values)
+    
+        x_org2, data_org2 = conditional_expectation_value('lifetime', 'spatial linear size', bins2, df, x_limit2, get_error_with_bootstrapping=True, bootstrap_size=bootstrap_size)
+        m_org2 = fit_data(fit_function, x_org2, unp.nominal_values(data_org2), unp.std_devs(data_org2), starting_values)
+    elif fit_function == 'gamma1_gamma3_2':
+        x_org1, data_org1 = conditional_expectation_value('lifetime', 'total dissipation', bins1, df, x_limit1, get_error_with_bootstrapping=True, bootstrap_size=bootstrap_size)
+        m_org1 = fit_data(fit_function, x_org1, unp.nominal_values(data_org1), unp.std_devs(data_org1), starting_values)
+    
+        x_org2, data_org2 = conditional_expectation_value('spatial linear size', 'lifetime', bins2, df, x_limit2, get_error_with_bootstrapping=True, bootstrap_size=bootstrap_size)
+        m_org2 = fit_data(fit_function, x_org2, unp.nominal_values(data_org2), unp.std_devs(data_org2), starting_values)
+    valid_counter = 0
+    for sample in samples:
+        if fit_function == 'gamma1_gamma3_1':      
+            x1, data1 = conditional_expectation_value('total dissipation', 'lifetime', bins1, sample, x_limit1)
+            m1 = fit_data('E_of_S_T', x1, unp.nominal_values(data1), unp.std_devs(data_org1), starting_values)
+            x2, data2 = conditional_expectation_value('lifetime', 'spatial linear size', bins2, sample, x_limit2)
+            m2 = fit_data('E_of_T_L', x2, unp.nominal_values(data2), unp.std_devs(data_org2), starting_values)
+            if (m1.valid == True) and (m2.valid == True):
+                valid_counter = valid_counter + 1
+                parameter_amp1, parameter_exp1 = m1.values['amp'], m1.values['exponent']
+                parameter_amp2, parameter_exp2 = m2.values['amp'], m2.values['exponent']
+                product.append(parameter_exp1*parameter_exp2)
+        elif fit_function == 'gamma1_gamma3_2':
+            x1, data1 = conditional_expectation_value('lifetime', 'total dissipation', bins1, sample, x_limit1)
+            m1 = fit_data('E_of_S_T', x1, unp.nominal_values(data1), unp.std_devs(data_org1), starting_values)
+            x2, data2 = conditional_expectation_value('spatial linear size', 'lifetime', bins2, sample, x_limit2)
+            m2 = fit_data('E_of_T_L', x2, unp.nominal_values(data2), unp.std_devs(data_org2), starting_values)
+            if (m1.valid == True) and (m2.valid == True):
+                valid_counter = valid_counter + 1
+                parameter_amp1, parameter_exp1 = m1.values['amp'], m1.values['exponent']
+                parameter_amp2, parameter_exp2 = m2.values['amp'], m2.values['exponent']
+                product.append(parameter_exp1*parameter_exp2)           
+
+    product = np.array(product)
+    org_product = m_org1.values['exponent'] * m_org2.values['exponent']
+
+    std = np.std(product)
+
+    return {"product": unc.ufloat(org_product, std), "products_from_bootstrap": product, "samples": samples, "number_of_valid_fits": valid_counter}
 
 
 
@@ -146,10 +206,17 @@ def get_exponent_from_simulation_data_conditional_exp_value(fit_function: str, b
 
     cov_mat = np.cov(np.stack((parameters_amp, parameters_exp), axis = 0))
 
-    return {"parameters": [unc.ufloat(m_org.values['amp'], cov_mat[0,0]**0.5), unc.ufloat(m_org.values['exponent'], cov_mat[1,1]**0.5)], "covariance_matrix": cov_mat, "x": x, "data": unp.nominal_values(data_org), "errors": unp.std_devs(data_org), "model": fit_functions[fit_function](x, m_org.values['amp'], m_org.values['exponent']), "samples": samples}
+    return {"exponent_values_from_bootrstrap": parameters_exp, "parameters": [unc.ufloat(m_org.values['amp'], cov_mat[0,0]**0.5), unc.ufloat(m_org.values['exponent'], cov_mat[1,1]**0.5)], "covariance_matrix": cov_mat, "x": x, "data": unp.nominal_values(data_org), "errors": unp.std_devs(data_org), "model": fit_functions[fit_function](x, m_org.values['amp'], m_org.values['exponent']), "samples": samples}
 
 
-def generate_bootstrap_samples(data, bootstrap_size: int, block_size: int=0):
+def generate_following_indices(indices, n):
+    result = []
+    for index in indices:
+        result.extend(range(index, index + n ))
+    return result
+
+
+def generate_bootstrap_samples(data: pd.DataFrame, bootstrap_size: int, block_size: int=0):
     """Generate bootstrap sample of size bootstrap_size for given simulation data
 
     Args:
@@ -159,8 +226,18 @@ def generate_bootstrap_samples(data, bootstrap_size: int, block_size: int=0):
 
     Returns:
         pd.DataFrame: bootstrap_size bootstrap samples
-    """ 
-    return [data.sample(data.shape[0], replace=True) for _ in range(bootstrap_size)]
+    """
+    if block_size == 0:
+        return [data.sample(data.shape[0], replace=True) for _ in range(bootstrap_size)]
+    else:
+        numb = math.floor(data.shape[0] / block_size)
+        samples = []
+        for x in range(bootstrap_size):
+            sample_f_d = np.random.randint(0, numb, numb)
+            sample_f_d = generate_following_indices(sample_f_d, block_size)
+            sample = df.iloc[sample_f_d]
+            samples.append(sample)
+        return samples
 
 def get_exponent_from_simulation_data(fit_function: str, bins: np.ndarray, df: pd.DataFrame, variable: str, bootstrap_size: int, x_limit: list=[], starting_values = [1,1]) -> dict:
     """Get exponent with uncertainty for specified distribution and covariance matrix
@@ -208,7 +285,7 @@ def get_exponent_from_simulation_data(fit_function: str, bins: np.ndarray, df: p
 
     cov_mat = np.cov(np.stack((parameters_amp, parameters_exp), axis = 0))
 
-    return {"parameters": [unc.ufloat(m_org.values['amp'], cov_mat[0,0]**0.5), unc.ufloat(m_org.values['exponent'], cov_mat[1,1]**0.5)], "covariance_matrix": cov_mat, "x": bin_centers, "data": data, "errors": errors, "model": fit_functions[fit_function](bin_centers, m_org.values['amp'], m_org.values['exponent']), "samples": samples}
+    return {"exponent_values_from_bootrstrap": parameters_exp, "parameters": [unc.ufloat(m_org.values['amp'], cov_mat[0,0]**0.5), unc.ufloat(m_org.values['exponent'], cov_mat[1,1]**0.5)], "covariance_matrix": cov_mat, "x": bin_centers, "data": data, "errors": errors, "model": fit_functions[fit_function](bin_centers, m_org.values['amp'], m_org.values['exponent']), "samples": samples}
 
 
 def fit_data(fit_function: str, x:np.ndarray, data: np.ndarray, errors: np.ndarray, starting_values: list) -> float:
@@ -229,7 +306,9 @@ def fit_data(fit_function: str, x:np.ndarray, data: np.ndarray, errors: np.ndarr
     m.migrad()
     return m
 
-def save_exponent_data(fit_function: str, bins: dict, bootstrap_size: str, fit_results: dict, file_to_save, file_to_load=False) -> None:
+
+
+def save_exponent_data(fit_function: str, bins: dict, bootstrap_size: str, fit_results: dict, file_to_save, file_to_load=False, bins2=False) -> None:
     """_summary_
 
     Args:
@@ -250,15 +329,28 @@ def save_exponent_data(fit_function: str, bins: dict, bootstrap_size: str, fit_r
     #    bins_start = fit_parameter['bins'][0]
     #    bins_end = fit_parameter['bins'][-1]       
     #    bins_count = len(fit_parameter['bins'])
-    bins = get_bins_from_parameter_settings(*bins)
-    temp_df = pd.DataFrame({'fit function': [fit_function], 'variable': [fit_funtion_mapping[fit_function][0]], 'condition': [fit_funtion_mapping[fit_function][1]], 'left bin edge': [bins[0]], 'right bin edge': [bins[-1]], 'count of bins': [len(bins)-1], 'bootstrap size': [bootstrap_size], 'amplitude from fit result': [fit_results['parameters'][0]], 'exponent from fit result': [fit_results['parameters'][1]], 'covariance c_11': [fit_results['covariance_matrix'][0,0]], 'covariance c_12': [fit_results['covariance_matrix'][0,1]], 'covariance c_22': [fit_results['covariance_matrix'][1,1]]})
-    
-    if not file_to_load:
-        temp_df.to_csv(file_to_save, sep=';', encoding='utf8', index=False)
+    if bins2 == False:
+        bins = get_bins_from_parameter_settings(*bins)
+        temp_df = pd.DataFrame({'fit function': [fit_function], 'variable': [fit_funtion_mapping[fit_function][0]], 'condition': [fit_funtion_mapping[fit_function][1]], 'left bin edge': [bins[0]], 'right bin edge': [bins[-1]], 'count of bins': [len(bins)-1], 'bootstrap size': [bootstrap_size], 'amplitude from fit result': [fit_results['parameters'][0]], 'exponent from fit result': [fit_results['parameters'][1]], 'covariance c_11': [fit_results['covariance_matrix'][0,0]], 'covariance c_12': [fit_results['covariance_matrix'][0,1]], 'covariance c_22': [fit_results['covariance_matrix'][1,1]]})
+        
+        if not file_to_load:
+            temp_df.to_csv(file_to_save, sep=';', encoding='utf8', index=False)
+        else:
+            df = pd.read_csv(file_to_load, sep=';', encoding='utf8')
+            df = pd.concat([df, temp_df], ignore_index=True)
+            df.to_csv(file_to_save, sep=';', encoding='utf8', index=False)
     else:
-        df = pd.read_csv(file_to_load, sep=';', encoding='utf8')
-        df = pd.concat([df, temp_df], ignore_index=True)
-        df.to_csv(file_to_save, sep=';', encoding='utf8', index=False)
+        bins = get_bins_from_parameter_settings(*bins)
+        bins2 = get_bins_from_parameter_settings(*bins2)
+        temp_df = pd.DataFrame({'fit function': [fit_function], 'left bin edge 1': [bins[0]], 'right bin edge 1': [bins[-1]], 'count of bins 1': [len(bins)-1], 'left bin edge 2': [bins2[0]], 'right bin edge 2': [bins2[-1]], 'count of bins 2': [len(bins2)-1], 'bootstrap size': [bootstrap_size], 'product from fit result': [fit_results['product']], 'number of valid fits': [fit_results['number_of_valid_fits']]})
+        
+        if not file_to_load:
+            temp_df.to_csv(file_to_save, sep=';', encoding='utf8', index=False)
+        else:
+            df = pd.read_csv(file_to_load, sep=';', encoding='utf8')
+            df = pd.concat([df, temp_df], ignore_index=True)
+            df.to_csv(file_to_save, sep=';', encoding='utf8', index=False)
+
 
 def load_simulation_data(sim_data: dict) -> pd.DataFrame:
     """_summary_
@@ -287,10 +379,13 @@ fit_funtion_mapping = {
     'E_of_S_L': ['total dissipation', 'spatial linear size'],
     'E_of_L_S': ['spatial linear size', 'total dissipation'],
     'E_of_T_L': ['lifetime', 'spatial linear size'],
-    'E_of_L_T': ['spatial linear size', 'lifetime']
+    'E_of_L_T': ['spatial linear size', 'lifetime'],
+    'gamma1_gamma3_1': ['E_of_S_T', 'E_of_T_L'],
+    'gamma1_gamma3_2': ['E_of_T_S', 'E_of_L_T']
+
 }
 
-def run_calculation(fit_function: str, bootrstrap_size: int, bins: list, df: pd.DataFrame):
+def run_calculation(fit_function: str, bootrstrap_size: int, bins: list, df: pd.DataFrame, bins2=False):
     """ Function takes the fit function and automatically decided which exponent should get calculated
 
     Args:
@@ -310,7 +405,12 @@ def run_calculation(fit_function: str, bootrstrap_size: int, bins: list, df: pd.
             result = get_exponent_from_simulation_data(fit_function, bins, df, fit_funtion_mapping[fit_function][0], bootrstrap_size)
 
     else:
-        result = get_exponent_from_simulation_data_conditional_exp_value(fit_function, bins, df, fit_funtion_mapping[fit_function][0], fit_funtion_mapping[fit_function][1], bootrstrap_size)
+        if fit_function == 'gamma1_gamma3_1':
+            result = get_exponent_product_from_simulation_data_conditional_exp_value('gamma1_gamma3_1', bins, bins2, df, bootrstrap_size)
+        elif fit_function == 'gamma1_gamma3_2':
+            result = get_exponent_product_from_simulation_data_conditional_exp_value('gamma1_gamma3_2', bins, bins2, df, bootrstrap_size)
+        else:
+            result = get_exponent_from_simulation_data_conditional_exp_value(fit_function, bins, df, fit_funtion_mapping[fit_function][0], fit_funtion_mapping[fit_function][1], bootrstrap_size)
     return result
 
 def calculate_products_of_exponents():
