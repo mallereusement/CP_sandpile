@@ -11,6 +11,7 @@
     - bootstrap size: 100
     - xlabels: [s, $\tau$, l, $\tau$, s, l, s, l, $\tau$, f]
     - ylabels: [P(S), P(T), P(L), E(S|T), E(T|S), E(S|L), E(L|S), E(T|L), E(L|T), S(f)]
+    - block size: 0
 
 - setting02
     - name: 3d-non_conservative-N20-abs_True_z4-closed
@@ -25,6 +26,7 @@
     - bootstrap size: 100
     - xlabels: [s, $\tau$, l, $\tau$, s, l, s, l, $\tau$, f]
     - ylabels: [P(S), P(T), P(L), E(S|T), E(T|S), E(S|L), E(L|S), E(T|L), E(L|T), S(f)]
+    - block size: 0
 
 - setting03
     - name: 4d-non_conservative-N20-abs_True_z4-closed
@@ -39,3 +41,4 @@
     - bootstrap size: 100
     - xlabels: [s, $\tau$, l, $\tau$, s, l, s, l, $\tau$, f]
     - ylabels: [P(S), P(T), P(L), E(S|T), E(T|S), E(S|L), E(L|S), E(T|L), E(L|T), S(f)]
+    - block size: 0

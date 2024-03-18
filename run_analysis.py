@@ -39,7 +39,7 @@ def read_analysis_parameters(file_path, format_bool, format_list, format_int) ->
 
 format_bool = ['save plots']
 format_list = ['start bins', 'end bins', 'bin width']
-format_int = ['power spectrum R', 'power spectrum T', 'power spectrum N', 'bootstrap size']
+format_int = ['power spectrum R', 'power spectrum T', 'power spectrum N', 'bootstrap size', 'block size']
 format_list_str = ['fit functions', 'xlabels', 'ylabels']
 
 if __name__ == '__main__':
@@ -108,7 +108,7 @@ if __name__ == '__main__':
                     bin_end = analysis_parameters[parameter]['end bins'][i]
                     bin_width = analysis_parameters[parameter]['bin width'][i]
                     bins = [bin_start, bin_end, bin_width]
-                    result = calc_exponents.run_calculation(analysis_parameters[parameter]['fit functions'][i], analysis_parameters[parameter]['bootstrap size'], bins, df)
+                    result = calc_exponents.run_calculation(analysis_parameters[parameter]['fit functions'][i], analysis_parameters[parameter]['bootstrap size'], bins, df, block_size=analysis_parameters[parameter]['block size'])
                     if 'gamma1_gamma3_1' in analysis_parameters[parameter]['fit functions']:
                         if analysis_parameters[parameter]['fit functions'][i] == 'E_of_S_T':
                             bin_start1 = analysis_parameters[parameter]['start bins'][i]
@@ -145,11 +145,11 @@ if __name__ == '__main__':
                         calc_exponents.save_exponent_data(analysis_parameters[parameter]['fit functions'][i], bins, analysis_parameters[parameter]['bootstrap size'], result, file_name_exponent_calculation, file_to_load=file_name_exponent_calculation)
         c = 0
         if 'gamma1_gamma3_1' in analysis_parameters[parameter]['fit functions']:
-            result = calc_exponents.run_calculation('gamma1_gamma3_1', analysis_parameters[parameter]['bootstrap size'], bins1, df, bins2=bins2)
+            result = calc_exponents.run_calculation('gamma1_gamma3_1', analysis_parameters[parameter]['bootstrap size'], bins1, df, bins2=bins2, block_size=analysis_parameters[parameter]['block size'])
             calc_exponents.save_exponent_data('gamma1_gamma3_1', bins1, analysis_parameters[parameter]['bootstrap size'], result, file_name_exponent_calculation_products, file_to_load=False, bins2=bins2)
             c = 1
         if 'gamma1_gamma3_2' in analysis_parameters[parameter]['fit functions']:
-            result = calc_exponents.run_calculation('gamma1_gamma3_2', analysis_parameters[parameter]['bootstrap size'], bins3, df, bins2=bins4)
+            result = calc_exponents.run_calculation('gamma1_gamma3_2', analysis_parameters[parameter]['bootstrap size'], bins3, df, bins2=bins4, block_size=analysis_parameters[parameter]['block size'])
             if c == 1:
                 calc_exponents.save_exponent_data('gamma1_gamma3_2', bins3, analysis_parameters[parameter]['bootstrap size'], result, file_name_exponent_calculation_products, file_to_load=file_name_exponent_calculation_products, bins2=bins4)
             else:

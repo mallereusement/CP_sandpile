@@ -108,7 +108,7 @@ def get_exponent_from_simulation_data_power_spectrum(fit_function: str, bins: np
     pass
     #samples = generate_bootstrap_samples(df, bootstrap_size)
 
-def get_exponent_product_from_simulation_data_conditional_exp_value(fit_function: str, bins1: np.ndarray, bins2: np.ndarray, df: pd.DataFrame, bootstrap_size: int, x_limit1: list=[], x_limit2: list=[], starting_values: list = [1, 1]) -> dict: # ToDo
+def get_exponent_product_from_simulation_data_conditional_exp_value(fit_function: str, bins1: np.ndarray, bins2: np.ndarray, df: pd.DataFrame, bootstrap_size: int, x_limit1: list=[], x_limit2: list=[], starting_values: list = [1, 1], block_size: int=0) -> dict: # ToDo
     """Get exponent of conditional expectation value with uncertainty for specified distribution and covariance matrix
 
     Args:
@@ -123,7 +123,7 @@ def get_exponent_product_from_simulation_data_conditional_exp_value(fit_function
     Returns:
         dict: ["parameters"] Fit parameters with errors, ["covariance_matrix"] covariance matrix
     """
-    samples = generate_bootstrap_samples(df, bootstrap_size)
+    samples = generate_bootstrap_samples(df, bootstrap_size, block_size=block_size)
     product = []
 
     if fit_function == 'gamma1_gamma3_1':
@@ -170,7 +170,7 @@ def get_exponent_product_from_simulation_data_conditional_exp_value(fit_function
 
 
 
-def get_exponent_from_simulation_data_conditional_exp_value(fit_function: str, bins: np.ndarray, df: pd.DataFrame, variable: str, condition: str, bootstrap_size: int, x_limit: list=[], starting_values: list = [1, 1]) -> dict: # ToDo
+def get_exponent_from_simulation_data_conditional_exp_value(fit_function: str, bins: np.ndarray, df: pd.DataFrame, variable: str, condition: str, bootstrap_size: int, x_limit: list=[], starting_values: list = [1, 1], block_size: int=0) -> dict: # ToDo
     """Get exponent of conditional expectation value with uncertainty for specified distribution and covariance matrix
 
     Args:
@@ -185,7 +185,7 @@ def get_exponent_from_simulation_data_conditional_exp_value(fit_function: str, b
     Returns:
         dict: ["parameters"] Fit parameters with errors, ["covariance_matrix"] covariance matrix
     """
-    samples = generate_bootstrap_samples(df, bootstrap_size)
+    samples = generate_bootstrap_samples(df, bootstrap_size, block_size=block_size)
 
 
     parameters_amp = []
@@ -239,7 +239,7 @@ def generate_bootstrap_samples(data: pd.DataFrame, bootstrap_size: int, block_si
             samples.append(sample)
         return samples
 
-def get_exponent_from_simulation_data(fit_function: str, bins: np.ndarray, df: pd.DataFrame, variable: str, bootstrap_size: int, x_limit: list=[], starting_values = [1,1]) -> dict:
+def get_exponent_from_simulation_data(fit_function: str, bins: np.ndarray, df: pd.DataFrame, variable: str, bootstrap_size: int, x_limit: list=[], starting_values = [1,1], block_size: int=0) -> dict:
     """Get exponent with uncertainty for specified distribution and covariance matrix
 
     Args:
@@ -262,7 +262,7 @@ def get_exponent_from_simulation_data(fit_function: str, bins: np.ndarray, df: p
         df = df[(df[variable] >= x_limit[0]) & (df[variable] <= x_limit[1])]
 
     bin_centers = (bins[:-1] + bins[1:]) / 2
-    samples = generate_bootstrap_samples(df, bootstrap_size)
+    samples = generate_bootstrap_samples(df, bootstrap_size, block_size=block_size)
     hist_data = [np.histogram(i[variable], bins=bins)[0] for i in samples]
     samples = np.array([i for i in hist_data])
     errors = np.std(samples, axis=0)
@@ -302,7 +302,7 @@ def fit_data(fit_function: str, x:np.ndarray, data: np.ndarray, errors: np.ndarr
     """
     least_squares = LeastSquares(x, data, errors, fit_functions[fit_function])
     m = Minuit(least_squares, *starting_values)
-    m.limits = [(0, None), (0.3, 4)]
+    m.limits = [(0, None), (0.2, 5)]
     m.migrad()
     return m
 
@@ -385,7 +385,7 @@ fit_funtion_mapping = {
 
 }
 
-def run_calculation(fit_function: str, bootrstrap_size: int, bins: list, df: pd.DataFrame, bins2=False):
+def run_calculation(fit_function: str, bootrstrap_size: int, bins: list, df: pd.DataFrame, bins2=False, block_size: int = 0):
     """ Function takes the fit function and automatically decided which exponent should get calculated
 
     Args:
@@ -402,15 +402,15 @@ def run_calculation(fit_function: str, bootrstrap_size: int, bins: list, df: pd.
         if fit_function == 'S_of_f':
             result = get_exponent_from_simulation_data_power_spectrum() # To Do
         else:
-            result = get_exponent_from_simulation_data(fit_function, bins, df, fit_funtion_mapping[fit_function][0], bootrstrap_size)
+            result = get_exponent_from_simulation_data(fit_function, bins, df, fit_funtion_mapping[fit_function][0], bootrstrap_size, block_size=block_size)
 
     else:
         if fit_function == 'gamma1_gamma3_1':
-            result = get_exponent_product_from_simulation_data_conditional_exp_value('gamma1_gamma3_1', bins, bins2, df, bootrstrap_size)
+            result = get_exponent_product_from_simulation_data_conditional_exp_value('gamma1_gamma3_1', bins, bins2, df, bootrstrap_size, block_size=block_size)
         elif fit_function == 'gamma1_gamma3_2':
-            result = get_exponent_product_from_simulation_data_conditional_exp_value('gamma1_gamma3_2', bins, bins2, df, bootrstrap_size)
+            result = get_exponent_product_from_simulation_data_conditional_exp_value('gamma1_gamma3_2', bins, bins2, df, bootrstrap_size, block_size=block_size)
         else:
-            result = get_exponent_from_simulation_data_conditional_exp_value(fit_function, bins, df, fit_funtion_mapping[fit_function][0], fit_funtion_mapping[fit_function][1], bootrstrap_size)
+            result = get_exponent_from_simulation_data_conditional_exp_value(fit_function, bins, df, fit_funtion_mapping[fit_function][0], fit_funtion_mapping[fit_function][1], bootrstrap_size, block_size=block_size)
     return result
 
 def calculate_products_of_exponents():
