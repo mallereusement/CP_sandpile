@@ -71,7 +71,7 @@ if __name__ == '__main__':
 
 
         run_sandpile.save_simulation_parameters('./' + f'{filepath_datastorage}/{analysis_parameters[parameter]["name"]}/analysis_parameter', analysis_parameters[parameter])
-        os.mkdir('./' + f'{filepath_datastorage}/{analysis_parameters[parameter]["name"]}/results')
+        os.mkdir('./' + f'{filepath_datastorage}/{analysis_parameters[parameter]["name"]}/results_{analysis_parameters[parameter]["name for save"]}')
 
         
 

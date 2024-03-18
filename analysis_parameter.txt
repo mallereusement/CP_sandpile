@@ -1,5 +1,6 @@
 - setting01
     - name: 2d-non_conservative-N40-abs_True_z4-closed
+    - name for save: ana1
     - fit functions: [P_of_S, P_of_T, P_of_L, E_of_S_T, E_of_T_S, E_of_S_L, E_of_L_S, E_of_T_L, E_of_L_T, S_of_f]
     - start bins: [10, 10, 10, 10, 10, 10, 10, 10, 10, 1]
     - end bins: [500, 200, 60, 400, 400, 20, 400, 20, 100, 10]
@@ -15,6 +16,7 @@
 
 - setting02
     - name: 3d-non_conservative-N20-abs_True_z4-closed
+    - name for save: ana1
     - fit functions: [P_of_S, P_of_T, P_of_L, E_of_S_T, E_of_T_S, E_of_S_L, E_of_L_S, E_of_T_L, E_of_L_T, S_of_f]
     - start bins: [10, 10, 10, 10, 10, 10, 10, 10, 10, 1]
     - end bins: [500, 200, 60, 400, 400, 20, 400, 20, 100, 10]
@@ -30,6 +32,7 @@
 
 - setting03
     - name: 4d-non_conservative-N20-abs_True_z4-closed
+    - name for save: ana1
     - fit functions: [P_of_S, P_of_T, P_of_L, E_of_S_T, E_of_T_S, E_of_S_L, E_of_L_S, E_of_T_L, E_of_L_T, S_of_f]
     - start bins: [10, 10, 10, 10, 10, 10, 10, 10, 10, 1]
     - end bins: [500, 200, 60, 400, 400, 20, 400, 20, 100, 10]
