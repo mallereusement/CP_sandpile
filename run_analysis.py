@@ -58,7 +58,7 @@ if __name__ == '__main__':
     for parameter in analysis_parameters:            
             
         if analysis_parameters[parameter]['save plots']:
-            os.mkdir('./' + f'{filepath_datastorage}/{analysis_parameters[parameter]["name"]}/plots')  ## create folder to store plots 
+            os.mkdir('./' + f'{filepath_datastorage}/{analysis_parameters[parameter]["name"]}/plots_{analysis_parameters[parameter]["name for save"]}')  ## create folder to store plots 
             
             ## load data for z-means:
             means_df = pd.read_csv(f'{filepath_datastorage}/{analysis_parameters[parameter]["name"]}/simulation_data/data_mean.csv', sep=';', encoding='utf8')
@@ -67,10 +67,10 @@ if __name__ == '__main__':
 
             ## plot z-means and save plot
             plotting.nice_plot(times*1e-5, means, 't/$10^5$', '<z>', xmin=-0.01, xmax=2,  log=False)
-            plt.savefig('./' + f'{filepath_datastorage}/{analysis_parameters[parameter]["name"]}/plots/z_means.jpg', dpi=300)
+            plt.savefig('./' + f'{filepath_datastorage}/{analysis_parameters[parameter]["name"]}/plots_{analysis_parameters[parameter]["name for save"]}/z_means.jpg', dpi=300)
 
 
-        run_sandpile.save_simulation_parameters('./' + f'{filepath_datastorage}/{analysis_parameters[parameter]["name"]}/analysis_parameter', analysis_parameters[parameter])
+        run_sandpile.save_simulation_parameters('./' + f'{filepath_datastorage}/{analysis_parameters[parameter]["name"]}/analysis_parameter_{analysis_parameters[parameter]["name for save"]}', analysis_parameters[parameter])
         os.mkdir('./' + f'{filepath_datastorage}/{analysis_parameters[parameter]["name"]}/results_{analysis_parameters[parameter]["name for save"]}')
 
         
@@ -84,13 +84,13 @@ if __name__ == '__main__':
             T = analysis_parameters[parameter]['power spectrum T']
             power_spectrum_, freq = power_spectrum.calculate_power_spectrum(max_length, R, T, N, l)
             df_power_spectrum = pd.DataFrame({'frequency': freq, 'power spectrum': power_spectrum_})
-            df_power_spectrum.to_csv(f'{filepath_datastorage}/{analysis_parameters[parameter]["name"]}/results/power_spectrum.csv', sep=';', encoding='utf8', index=False)
+            df_power_spectrum.to_csv(f'{filepath_datastorage}/{analysis_parameters[parameter]["name"]}/results_{analysis_parameters[parameter]["name for save"]}/power_spectrum.csv', sep=';', encoding='utf8', index=False)
             idx = analysis_parameters[parameter]['fit functions'].index('S_of_f')
             # To Do: Exponent calculation
             if analysis_parameters[parameter]['save plots']:
                 ## plot power spectrum and save plot
                 plotting.nice_plot(freq, power_spectrum_, 'f', 'S(f)', -4, 0)
-                plt.savefig('./' + f'{filepath_datastorage}/{analysis_parameters[parameter]["name"]}/plots/S_of_f.jpg', dpi=300)
+                plt.savefig('./' + f'{filepath_datastorage}/{analysis_parameters[parameter]["name"]}/plots_{analysis_parameters[parameter]["name for save"]}/S_of_f.jpg', dpi=300)
 
                 
             
@@ -99,15 +99,16 @@ if __name__ == '__main__':
         if (set(analysis_parameters[parameter]['fit functions']) & set(calc_exponents.keys_of_fit_functions)):
             df = pd.read_csv(f'{filepath_datastorage}/{analysis_parameters[parameter]["name"]}/simulation_data/data_for_exponent_calculation.csv', sep=';', encoding='utf8')
             file_count = False
-            file_name_exponent_calculation = f'{filepath_datastorage}/{analysis_parameters[parameter]["name"]}/results/results.csv'
-            file_name_exponent_calculation_products = f'{filepath_datastorage}/{analysis_parameters[parameter]["name"]}/results/results_products.csv'
+            file_name_exponent_calculation = f'{filepath_datastorage}/{analysis_parameters[parameter]["name"]}/results_{analysis_parameters[parameter]["name for save"]}/results.csv'
+            file_name_exponent_calculation_products = f'{filepath_datastorage}/{analysis_parameters[parameter]["name"]}/results_{analysis_parameters[parameter]["name for save"]}/results_products.csv'
 
-            for i in range(len(analysis_parameters[parameter]['fit functions'])):
+            for i in range(len(analysis_parameters[parameter]['start bins'])):
                 if i != idx:
                     bin_start = analysis_parameters[parameter]['start bins'][i]
                     bin_end = analysis_parameters[parameter]['end bins'][i]
                     bin_width = analysis_parameters[parameter]['bin width'][i]
                     bins = [bin_start, bin_end, bin_width]
+                    print(f'Analysis with fit function {analysis_parameters[parameter]["fit functions"][i]}')
                     result = calc_exponents.run_calculation(analysis_parameters[parameter]['fit functions'][i], analysis_parameters[parameter]['bootstrap size'], bins, df, block_size=analysis_parameters[parameter]['block size'])
                     if 'gamma1_gamma3_1' in analysis_parameters[parameter]['fit functions']:
                         if analysis_parameters[parameter]['fit functions'][i] == 'E_of_S_T':
@@ -135,7 +136,7 @@ if __name__ == '__main__':
                     if analysis_parameters[parameter]['save plots']:
                         ## plot conditional expectation values and fit and save plots
                         plotting.plot_conditional_exponents(result, analysis_parameters[parameter], i)
-                        plt.savefig('./' + f'{filepath_datastorage}/{analysis_parameters[parameter]["name"]}/plots/{analysis_parameters[parameter]["fit functions"][i]}.jpg', dpi=300)
+                        plt.savefig('./' + f'{filepath_datastorage}/{analysis_parameters[parameter]["name"]}/plots_{analysis_parameters[parameter]["name for save"]}/{analysis_parameters[parameter]["fit functions"][i]}.jpg', dpi=300)
                     
                     
                     if not file_count:
@@ -145,10 +146,12 @@ if __name__ == '__main__':
                         calc_exponents.save_exponent_data(analysis_parameters[parameter]['fit functions'][i], bins, analysis_parameters[parameter]['bootstrap size'], result, file_name_exponent_calculation, file_to_load=file_name_exponent_calculation)
         c = 0
         if 'gamma1_gamma3_1' in analysis_parameters[parameter]['fit functions']:
+            print(f'Analysis with fit function gamma1_gamma3_1')
             result = calc_exponents.run_calculation('gamma1_gamma3_1', analysis_parameters[parameter]['bootstrap size'], bins1, df, bins2=bins2, block_size=analysis_parameters[parameter]['block size'])
             calc_exponents.save_exponent_data('gamma1_gamma3_1', bins1, analysis_parameters[parameter]['bootstrap size'], result, file_name_exponent_calculation_products, file_to_load=False, bins2=bins2)
             c = 1
         if 'gamma1_gamma3_2' in analysis_parameters[parameter]['fit functions']:
+            print(f'Analysis with fit function gamma1_gamma3_2')
             result = calc_exponents.run_calculation('gamma1_gamma3_2', analysis_parameters[parameter]['bootstrap size'], bins3, df, bins2=bins4, block_size=analysis_parameters[parameter]['block size'])
             if c == 1:
                 calc_exponents.save_exponent_data('gamma1_gamma3_2', bins3, analysis_parameters[parameter]['bootstrap size'], result, file_name_exponent_calculation_products, file_to_load=file_name_exponent_calculation_products, bins2=bins4)
