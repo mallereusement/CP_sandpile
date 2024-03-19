@@ -3,6 +3,9 @@ import pandas as pd
 from tqdm import tqdm
 import copy
 from scipy.stats import linregress, t
+import matplotlib.pyplot as plt
+import seaborn as sns
+from matplotlib.colors import LogNorm
 
 
 def detect_steady_state(data, window_size=20, confidence_level=0.99):
@@ -193,6 +196,14 @@ def write_data_for_exponent_calculation_to_file(filepath: str, filename: str, da
     df = pd.DataFrame(data)
     df.to_csv(f'{filepath}/{filename}.csv', sep=';', encoding='utf8')
 
+def plot_heatmap(crit_grid_sum, type, boundary_condition):
+    fig, ax = plt.subplots(figsize=(6,5))
+    
+    sns.heatmap(crit_grid_sum)#, norm=LogNorm())
+    ax.text(0.95, 0.95, f'perturbation = {type} \n boundary = {boundary_condition} ', ha='right', va='top', color='white', transform=ax.transAxes)
+    #plt.tight_layout()
+
+
 
 def run_simulation(simulation_parameter: dict, filepath_datastorage: str, simulation_name: str):
 
@@ -244,6 +255,8 @@ def run_simulation(simulation_parameter: dict, filepath_datastorage: str, simula
 
     grid = set_up_grid(N=N, d=d) # Initialize grid with z = 0
     grid_pertubation_tracker = set_up_grid(N, d) # Initialize grid that tracks pertubations
+    grid_dissipation_tracker = set_up_grid(N, d)  ## Initialize grid that tracks dissipations
+    
     t = 0 # Initialize time tracker
     count_avalanches = 0 # Track number of triggered avalanches
 
@@ -302,6 +315,7 @@ def run_simulation(simulation_parameter: dict, filepath_datastorage: str, simula
             
         t_post = t 
 
+        grid_dissipation_tracker += crit_grid
         
         if t_post - t_pre != 0: # if avalanche occurs, then this is valid
 
@@ -350,3 +364,9 @@ def run_simulation(simulation_parameter: dict, filepath_datastorage: str, simula
 
     if simulation_parameter['save mean value of grid']:
         write_data_for_exponent_calculation_to_file(f'{filepath_datastorage}/simulation_data', 'data_mean', means)
+        
+    
+    if d == 2:
+        ## plot perturbations in the grid
+        plot_heatmap(grid_dissipation_tracker, pertubation_mechanism, boundary_condition)
+        plt.savefig(f'{filepath_datastorage}/plots/heatmap_dissipation_{simulation_name}.jpg')

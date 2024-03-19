@@ -49,5 +49,6 @@ if __name__ == '__main__':
        
         os.mkdir('./' + args.path + f'/{simulation_parameters[parameter]["name"]}')
         os.mkdir('./' + args.path + f'/{simulation_parameters[parameter]["name"]}/simulation_data')
+        os.mkdir('./' + args.path + f'/{simulation_parameters[parameter]["name"]}/plots')
         save_simulation_parameters('./' + args.path + f'/{simulation_parameters[parameter]["name"]}/simulation_data/simulation_parameter', simulation_parameters[parameter])
         sim_alg.run_simulation(simulation_parameters[parameter], './' + args.path + f'/{simulation_parameters[parameter]["name"]}', simulation_parameters[parameter]["name"])
