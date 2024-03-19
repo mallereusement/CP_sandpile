@@ -357,16 +357,16 @@ def run_simulation(simulation_parameter: dict, filepath_datastorage: str, simula
 
     #### Save Data ####
     if simulation_parameter['save file for exponent calculation']:
-        write_data_for_exponent_calculation_to_file(f'{filepath_datastorage}/simulation_data', 'data_for_exponent_calculation', exp_data)
+        write_data_for_exponent_calculation_to_file(f'{filepath_datastorage}/{simulation_name}/simulation_data', 'data_for_exponent_calculation', exp_data)
 
     if simulation_parameter['save file for power spectrum calculation']:
-        write_data_for_power_spectrum_to_file(f'{filepath_datastorage}/simulation_data', 'data_for_power_spectrum_calculation', list_avalanches)
+        write_data_for_power_spectrum_to_file(f'{filepath_datastorage}/{simulation_name}/simulation_data', 'data_for_power_spectrum_calculation', list_avalanches)
 
     if simulation_parameter['save mean value of grid']:
-        write_data_for_exponent_calculation_to_file(f'{filepath_datastorage}/simulation_data', 'data_mean', means)
+        write_data_for_exponent_calculation_to_file(f'{filepath_datastorage}/{simulation_name}/simulation_data', 'data_mean', means)
         
     
     if d == 2:
         ## plot perturbations in the grid
         plot_heatmap(grid_dissipation_tracker, pertubation_mechanism, boundary_condition)
-        plt.savefig(f'{filepath_datastorage}/plots/heatmap_dissipation_{simulation_name}.jpg')
+        plt.savefig(f'{filepath_datastorage}/plots/{simulation_name}/heatmap_dissipation_{simulation_name}.jpg')

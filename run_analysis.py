@@ -53,12 +53,14 @@ if __name__ == '__main__':
     file_path = args.analysis_parameter_file
     analysis_parameters = read_analysis_parameters(file_path, format_bool, format_list, format_int)
     
-    
+    os.mkdir('./' + f'{filepath_datastorage}/results')  ## folder to store results in   
     
     for parameter in analysis_parameters:            
             
         if analysis_parameters[parameter]['save plots']:
-            os.mkdir('./' + f'{filepath_datastorage}/{analysis_parameters[parameter]["name"]}/plots_{analysis_parameters[parameter]["name for save"]}')  ## create folder to store plots 
+            #os.mkdir('./' + f'{filepath_datastorage}/{analysis_parameters[parameter]["name"]}/plots_{analysis_parameters[parameter]["name for save"]}')  ## create folder to store plots 
+            
+            #os.mkdir('./' + f'{filepath_datastorage}/plots/{analysis_parameters[parameter]["name"]}')
             
             ## load data for z-means:
             means_df = pd.read_csv(f'{filepath_datastorage}/{analysis_parameters[parameter]["name"]}/simulation_data/data_mean.csv', sep=';', encoding='utf8')
@@ -67,12 +69,14 @@ if __name__ == '__main__':
 
             ## plot z-means and save plot
             plotting.nice_plot(times*1e-5, means, 't/$10^5$', '<z>', xmin=-0.01, xmax=2,  log=False)
-            plt.savefig('./' + f'{filepath_datastorage}/{analysis_parameters[parameter]["name"]}/plots_{analysis_parameters[parameter]["name for save"]}/z_means.jpg', dpi=300)
+            #plt.savefig('./' + f'{filepath_datastorage}/{analysis_parameters[parameter]["name"]}/plots_{analysis_parameters[parameter]["name for save"]}/z_means.jpg', dpi=300)
+            plt.savefig('./' + f'{filepath_datastorage}/plots/{analysis_parameters[parameter]["name"]}/z_means.jpg', dpi=300)
 
 
-        run_sandpile.save_simulation_parameters('./' + f'{filepath_datastorage}/{analysis_parameters[parameter]["name"]}/analysis_parameter_{analysis_parameters[parameter]["name for save"]}', analysis_parameters[parameter])
-        os.mkdir('./' + f'{filepath_datastorage}/{analysis_parameters[parameter]["name"]}/results_{analysis_parameters[parameter]["name for save"]}')
-
+        run_sandpile.save_simulation_parameters('./' + f'{filepath_datastorage}/{analysis_parameters[parameter]["name"]}/analysis_parameter', analysis_parameters[parameter])
+        
+        os.mkdir('./' + f'{filepath_datastorage}/results/{analysis_parameters[parameter]["name"]}')
+        
         
 
 
@@ -84,13 +88,14 @@ if __name__ == '__main__':
             T = analysis_parameters[parameter]['power spectrum T']
             power_spectrum_, freq = power_spectrum.calculate_power_spectrum(max_length, R, T, N, l)
             df_power_spectrum = pd.DataFrame({'frequency': freq, 'power spectrum': power_spectrum_})
-            df_power_spectrum.to_csv(f'{filepath_datastorage}/{analysis_parameters[parameter]["name"]}/results_{analysis_parameters[parameter]["name for save"]}/power_spectrum.csv', sep=';', encoding='utf8', index=False)
+            df_power_spectrum.to_csv(f'{filepath_datastorage}/results/{analysis_parameters[parameter]["name"]}/power_spectrum.csv', sep=';', encoding='utf8', index=False)
             idx = analysis_parameters[parameter]['fit functions'].index('S_of_f')
             # To Do: Exponent calculation
             if analysis_parameters[parameter]['save plots']:
                 ## plot power spectrum and save plot
                 plotting.nice_plot(freq, power_spectrum_, 'f', 'S(f)', -4, 0)
-                plt.savefig('./' + f'{filepath_datastorage}/{analysis_parameters[parameter]["name"]}/plots_{analysis_parameters[parameter]["name for save"]}/S_of_f.jpg', dpi=300)
+                #plt.savefig('./' + f'{filepath_datastorage}/{analysis_parameters[parameter]["name"]}/plots_{analysis_parameters[parameter]["name for save"]}/S_of_f.jpg', dpi=300)
+                plt.savefig('./' + f'{filepath_datastorage}/plots/{analysis_parameters[parameter]["name"]}/S_of_f.jpg', dpi=300)
 
                 
             
@@ -99,8 +104,8 @@ if __name__ == '__main__':
         if (set(analysis_parameters[parameter]['fit functions']) & set(calc_exponents.keys_of_fit_functions)):
             df = pd.read_csv(f'{filepath_datastorage}/{analysis_parameters[parameter]["name"]}/simulation_data/data_for_exponent_calculation.csv', sep=';', encoding='utf8')
             file_count = False
-            file_name_exponent_calculation = f'{filepath_datastorage}/{analysis_parameters[parameter]["name"]}/results_{analysis_parameters[parameter]["name for save"]}/results.csv'
-            file_name_exponent_calculation_products = f'{filepath_datastorage}/{analysis_parameters[parameter]["name"]}/results_{analysis_parameters[parameter]["name for save"]}/results_products.csv'
+            file_name_exponent_calculation = f'{filepath_datastorage}/results/{analysis_parameters[parameter]["name"]}/results.csv'
+            file_name_exponent_calculation_products = f'{filepath_datastorage}/results/{analysis_parameters[parameter]["name"]}/results_products.csv'
 
             for i in range(len(analysis_parameters[parameter]['start bins'])):
                 if i != idx:
@@ -136,7 +141,8 @@ if __name__ == '__main__':
                     if analysis_parameters[parameter]['save plots']:
                         ## plot conditional expectation values and fit and save plots
                         plotting.plot_conditional_exponents(result, analysis_parameters[parameter], i)
-                        plt.savefig('./' + f'{filepath_datastorage}/{analysis_parameters[parameter]["name"]}/plots_{analysis_parameters[parameter]["name for save"]}/{analysis_parameters[parameter]["fit functions"][i]}.jpg', dpi=300)
+                        #plt.savefig('./' + f'{filepath_datastorage}/{analysis_parameters[parameter]["name"]}/plots_{analysis_parameters[parameter]["name for save"]}/{analysis_parameters[parameter]["fit functions"][i]}.jpg', dpi=300)
+                        plt.savefig('./' + f'{filepath_datastorage}/plots/{analysis_parameters[parameter]["name"]}/{analysis_parameters[parameter]["fit functions"][i]}.jpg', dpi=300)
                     
                     
                     if not file_count:
