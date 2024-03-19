@@ -58,7 +58,7 @@ if __name__ == '__main__':
     for parameter in analysis_parameters:            
             
         if analysis_parameters[parameter]['save plots']:
-            os.mkdir('./' + f'{filepath_datastorage}/{analysis_parameters[parameter]["name"]}/plots')  ## create folder to store plots 
+            #os.mkdir('./' + f'{filepath_datastorage}/{analysis_parameters[parameter]["name"]}/plots')  ## create folder to store plots 
             
             ## load data for z-means:
             means_df = pd.read_csv(f'{filepath_datastorage}/{analysis_parameters[parameter]["name"]}/simulation_data/data_mean.csv', sep=';', encoding='utf8')
@@ -71,7 +71,7 @@ if __name__ == '__main__':
 
 
         run_sandpile.save_simulation_parameters('./' + f'{filepath_datastorage}/{analysis_parameters[parameter]["name"]}/analysis_parameter', analysis_parameters[parameter])
-        os.mkdir('./' + f'{filepath_datastorage}/{analysis_parameters[parameter]["name"]}/results_{analysis_parameters[parameter]["name for save"]}')
+        #os.mkdir('./' + f'{filepath_datastorage}/{analysis_parameters[parameter]["name"]}/results_{analysis_parameters[parameter]["name for save"]}')
 
         
 
@@ -154,3 +154,4 @@ if __name__ == '__main__':
                 calc_exponents.save_exponent_data('gamma1_gamma3_2', bins3, analysis_parameters[parameter]['bootstrap size'], result, file_name_exponent_calculation_products, file_to_load=file_name_exponent_calculation_products, bins2=bins4)
             else:
                 calc_exponents.save_exponent_data('gamma1_gamma3_2', bins3, analysis_parameters[parameter]['bootstrap size'], result, file_name_exponent_calculation_products, file_to_load=False, bins2=bins4)
+    
