@@ -36,7 +36,7 @@ def conditional_expectation_value(variable: str, condition: str, bins: np.ndarra
     expectation_list_err = []
 
     for left_edge, right_edge in zip(bins[:-1], bins[1:]):
-        list = df[(df[condition] >= left_edge) & (df[condition] < right_edge)][variable].to_numpy()
+        list = df[(df[condition] > left_edge) & (df[condition] <= right_edge)][variable].to_numpy()
 
         if np.any(list):
 
@@ -73,6 +73,7 @@ def conditional_expectation_value(variable: str, condition: str, bins: np.ndarra
         pbar.close()
         expectation_list_bootstrap_global = np.array(expectation_list_bootstrap_global)
         stds = np.std(expectation_list_bootstrap_global, axis=0)
+        #print(stds)
         expectation_list = unp.uarray(unp.nominal_values(expectation_list), stds)
 
     
@@ -128,16 +129,16 @@ def get_exponent_product_from_simulation_data_conditional_exp_value(fit_function
 
     if fit_function == 'gamma1_gamma3_1':
         x_org1, data_org1 = conditional_expectation_value('total dissipation', 'lifetime', bins1, df, x_limit1, get_error_with_bootstrapping=True, bootstrap_size=bootstrap_size)
-        m_org1 = fit_data(fit_function, x_org1, unp.nominal_values(data_org1), unp.std_devs(data_org1), starting_values)
+        m_org1 = fit_data(fit_funtion_mapping[fit_function][0], x_org1, unp.nominal_values(data_org1), unp.std_devs(data_org1), starting_values)
     
         x_org2, data_org2 = conditional_expectation_value('lifetime', 'spatial linear size', bins2, df, x_limit2, get_error_with_bootstrapping=True, bootstrap_size=bootstrap_size)
-        m_org2 = fit_data(fit_function, x_org2, unp.nominal_values(data_org2), unp.std_devs(data_org2), starting_values)
+        m_org2 = fit_data(fit_funtion_mapping[fit_function][1], x_org2, unp.nominal_values(data_org2), unp.std_devs(data_org2), starting_values)
     elif fit_function == 'gamma1_gamma3_2':
         x_org1, data_org1 = conditional_expectation_value('lifetime', 'total dissipation', bins1, df, x_limit1, get_error_with_bootstrapping=True, bootstrap_size=bootstrap_size)
-        m_org1 = fit_data(fit_function, x_org1, unp.nominal_values(data_org1), unp.std_devs(data_org1), starting_values)
+        m_org1 = fit_data(fit_funtion_mapping[fit_function][0], x_org1, unp.nominal_values(data_org1), unp.std_devs(data_org1), starting_values)
     
         x_org2, data_org2 = conditional_expectation_value('spatial linear size', 'lifetime', bins2, df, x_limit2, get_error_with_bootstrapping=True, bootstrap_size=bootstrap_size)
-        m_org2 = fit_data(fit_function, x_org2, unp.nominal_values(data_org2), unp.std_devs(data_org2), starting_values)
+        m_org2 = fit_data(fit_funtion_mapping[fit_function][1], x_org2, unp.nominal_values(data_org2), unp.std_devs(data_org2), starting_values)
     valid_counter = 0
     for sample in samples:
         if fit_function == 'gamma1_gamma3_1':      
@@ -302,7 +303,7 @@ def fit_data(fit_function: str, x:np.ndarray, data: np.ndarray, errors: np.ndarr
     """
     least_squares = LeastSquares(x, data, errors, fit_functions[fit_function])
     m = Minuit(least_squares, *starting_values)
-    m.limits = [(0, None), (0.2, 5)]
+    m.limits = [(0, None), (0.2, 10)]
     m.migrad()
     return m
 
@@ -398,6 +399,7 @@ def run_calculation(fit_function: str, bootrstrap_size: int, bins: list, df: pd.
         _type_: fit results
     """
     bins = get_bins_from_parameter_settings(*bins)
+    #print(bins)
     if fit_funtion_mapping[fit_function][1] == '-':
         if fit_function == 'S_of_f':
             result = get_exponent_from_simulation_data_power_spectrum() # To Do
@@ -406,15 +408,16 @@ def run_calculation(fit_function: str, bootrstrap_size: int, bins: list, df: pd.
 
     else:
         if fit_function == 'gamma1_gamma3_1':
+            bins2 = get_bins_from_parameter_settings(*bins2)
             result = get_exponent_product_from_simulation_data_conditional_exp_value('gamma1_gamma3_1', bins, bins2, df, bootrstrap_size, block_size=block_size)
         elif fit_function == 'gamma1_gamma3_2':
+            bins2 = get_bins_from_parameter_settings(*bins2)
             result = get_exponent_product_from_simulation_data_conditional_exp_value('gamma1_gamma3_2', bins, bins2, df, bootrstrap_size, block_size=block_size)
         else:
             result = get_exponent_from_simulation_data_conditional_exp_value(fit_function, bins, df, fit_funtion_mapping[fit_function][0], fit_funtion_mapping[fit_function][1], bootrstrap_size, block_size=block_size)
     return result
 
-def calculate_products_of_exponents():
-    pass
+
 
 
 if __name__ == '__main__':
