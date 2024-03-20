@@ -70,7 +70,7 @@ if __name__ == '__main__':
             ## plot z-means and save plot
             plotting.nice_plot(times*1e-5, means, 't/$10^5$', '<z>', xmin=-0.01, xmax=2,  log=False)
             #plt.savefig('./' + f'{filepath_datastorage}/{analysis_parameters[parameter]["name"]}/plots_{analysis_parameters[parameter]["name for save"]}/z_means.jpg', dpi=300)
-            plt.savefig('./' + f'{filepath_datastorage}/plots/{analysis_parameters[parameter]["name"]}/z_means.jpg', dpi=300)
+            plt.savefig('./' + f'{filepath_datastorage}/plots/{analysis_parameters[parameter]["name"]}/{analysis_parameters[parameter]["name for save"]}/z_means.jpg', dpi=300)
 
 
         run_sandpile.save_simulation_parameters('./' + f'{filepath_datastorage}/{analysis_parameters[parameter]["name"]}/analysis_parameter', analysis_parameters[parameter])
@@ -95,7 +95,7 @@ if __name__ == '__main__':
                 ## plot power spectrum and save plot
                 plotting.nice_plot(freq, power_spectrum_, 'f', 'S(f)', -4, 0)
                 #plt.savefig('./' + f'{filepath_datastorage}/{analysis_parameters[parameter]["name"]}/plots_{analysis_parameters[parameter]["name for save"]}/S_of_f.jpg', dpi=300)
-                plt.savefig('./' + f'{filepath_datastorage}/plots/{analysis_parameters[parameter]["name"]}/S_of_f.jpg', dpi=300)
+                plt.savefig('./' + f'{filepath_datastorage}/plots/{analysis_parameters[parameter]["name"]}/{analysis_parameters[parameter]["name for save"]}/S_of_f.jpg', dpi=300)
 
                 
             
@@ -142,7 +142,7 @@ if __name__ == '__main__':
                         ## plot conditional expectation values and fit and save plots
                         plotting.plot_conditional_exponents(result, analysis_parameters[parameter], i)
                         #plt.savefig('./' + f'{filepath_datastorage}/{analysis_parameters[parameter]["name"]}/plots_{analysis_parameters[parameter]["name for save"]}/{analysis_parameters[parameter]["fit functions"][i]}.jpg', dpi=300)
-                        plt.savefig('./' + f'{filepath_datastorage}/plots/{analysis_parameters[parameter]["name"]}/{analysis_parameters[parameter]["fit functions"][i]}.jpg', dpi=300)
+                        plt.savefig('./' + f'{filepath_datastorage}/plots/{analysis_parameters[parameter]["name"]}/{analysis_parameters[parameter]["name for save"]}/{analysis_parameters[parameter]["fit functions"][i]}.jpg', dpi=300)
                     
                     
                     if not file_count:
