@@ -14,6 +14,8 @@ The Sandpile Dynamics Simulator uses cellular automata to model the behavior of 
 
 **-** [**Reproducing Data from Report**](#reproducing-data-from-report)
 
+**-** [**Outlook**](#outlook)
+
 ## Overview
 
 The Sandpile Dynamics Simulator is structured into two main components: simulation and analysis of simulated data.
@@ -271,3 +273,6 @@ After the simulation finished, run:
 ```bash
 python run_analysis.py final_data_reproduced analysis_parameters.txt
 ```
+
+## Outlook
+
