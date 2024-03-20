@@ -12,8 +12,6 @@ The Sandpile Dynamics Simulator uses cellular automata to model the behavior of 
 
 **-** [**Usage**](#usage)
 
-**-** [**Example**](#example-usage)
-
 **-** [**Reproducing Data from Report**](#reproducing-data-from-report)
 
 ## Overview
@@ -258,20 +256,6 @@ The folder structure of the saved simulation and analyis data looks the followin
 │           ├──results_products.csv
 │       ├──...
 │   ├──...
-```
-
-## Example Usage
-
-I have a file called `simulation_parameters.txt` with my simulation parameters and I want to store the simulated data in a folder called `simulated_data`. This can be done by executing:
-
-```bash
-python run_sandpile.py simulated_data simulation_parameters.txt
-```
-
-After this, I now want to run my analysis. I have a file with my parameters called `analysis_parameters.txt`. I run the following command.
-
-```bash
-python run_analysis.py simulated_data analysis_parameters.txt
 ```
 
 ## Reproducing Data from Report
