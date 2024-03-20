@@ -191,14 +191,14 @@ The following files can be generated
 
 - `data_for_exponent_calculation.csv` stores lifetime, total dissipation, spatial linear size and timestep of all record avalanches
 - `data_for_power_spectrum_calculation.txt.csv` stores dissipation rate of all record avalanches, not used in our report
-- `data_mean.csv` stores <z>(t)
+- `data_mean.csv` stores `<z>(t)`
 
 **Analysis files:**
 
 - `power_spectrum.csv`: powerspectrum, generated from specified power spectrum parameters, not used in our report
 - `results.csv`: fit results and exponents with errors
 - `results_products.csv`: Fit results for product of exponents
-- `plots` of <z>(t), N(s), N(t), N(l) and conditional expectation values with fits
+- `plots` of `<z>(t)`, `N(s)`, `N(t)`, `N(l)` and conditional expectation values with fits
 
 ### Folder structure
 
