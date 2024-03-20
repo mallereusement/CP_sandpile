@@ -10,13 +10,12 @@ def read_dataframes(path, t):
     # Iterate over each folder in the directory
     for folder_name in os.listdir(path):
         # Check if the folder starts with "results_"
-        if folder_name.startswith("results_"):
-            if t == 1:
-                csv_file_path = f'{path}/{folder_name}/results.csv'
-            if t == 2:
-                csv_file_path = f'{path}/{folder_name}/results_products.csv'
-            df = pd.read_csv(csv_file_path, sep=';', encoding='utf8')
-            dfs.append(df)
+        if t == 1:
+            csv_file_path = f'{path}/{folder_name}/results.csv'
+        if t == 2:
+            csv_file_path = f'{path}/{folder_name}/results_products.csv'
+        df = pd.read_csv(csv_file_path, sep=';', encoding='utf8')
+        dfs.append(df)
     return dfs
 
 def get_exponents(dfs, t):
