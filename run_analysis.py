@@ -104,8 +104,8 @@ if __name__ == '__main__':
         if (set(analysis_parameters[parameter]['fit functions']) & set(calc_exponents.keys_of_fit_functions)):
             df = pd.read_csv(f'{filepath_datastorage}/{analysis_parameters[parameter]["name"]}/simulation_data/data_for_exponent_calculation.csv', sep=';', encoding='utf8')
             file_count = False
-            file_name_exponent_calculation = f'{filepath_datastorage}/results/{analysis_parameters[parameter]["name"]}/results.csv'
-            file_name_exponent_calculation_products = f'{filepath_datastorage}/results/{analysis_parameters[parameter]["name"]}/results_products.csv'
+            file_name_exponent_calculation = f'{filepath_datastorage}/results/{analysis_parameters[parameter]["name"]}/{analysis_parameters[parameter]["name for save"]}/results.csv'
+            file_name_exponent_calculation_products = f'{filepath_datastorage}/results/{analysis_parameters[parameter]["name"]}/{analysis_parameters[parameter]["name for save"]}/results_products.csv'
 
             for i in range(len(analysis_parameters[parameter]['start bins'])):
                 if i != idx:
