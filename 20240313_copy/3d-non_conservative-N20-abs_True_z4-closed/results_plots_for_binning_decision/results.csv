@@ -1,0 +1,10 @@
+chi_square;degrees_of_freedom;fit function;variable;condition;left bin edge;right bin edge;count of bins;bootstrap size;amplitude from fit result;exponent from fit result;covariance c_11;covariance c_12;covariance c_22
+inf;997.0;P_of_S;total dissipation;-;1.0;1000.0;999;50;0.9999999999999996+/-nan;0.9999999999999998+/-nan;;;
+inf;997.0;P_of_T;lifetime;-;1.0;1000.0;999;50;0.9999999999999996+/-nan;0.9999999999999998+/-nan;;;
+inf;997.0;P_of_L;spatial linear size;-;1.0;1000.0;999;50;0.9999999999999996+/-nan;0.9999999999999998+/-nan;;;
+inf;997.0;E_of_S_T;total dissipation;lifetime;1.0;1000.0;999;50;0.9999999999999996+/-nan;0.9999999999999998+/-nan;;;
+inf;997.0;E_of_T_S;lifetime;total dissipation;1.0;1000.0;999;50;0.9999999999999996+/-nan;0.9999999999999998+/-nan;;;
+inf;997.0;E_of_S_L;total dissipation;spatial linear size;1.0;1000.0;999;50;0.9999999999999996+/-nan;0.9999999999999998+/-nan;;;
+inf;997.0;E_of_L_S;spatial linear size;total dissipation;1.0;1000.0;999;50;0.9999999999999996+/-nan;0.9999999999999998+/-nan;;;
+inf;997.0;E_of_T_L;lifetime;spatial linear size;1.0;1000.0;999;50;0.9999999999999996+/-nan;0.9999999999999998+/-nan;;;
+inf;997.0;E_of_L_T;spatial linear size;lifetime;1.0;1000.0;999;50;0.9999999999999996+/-nan;0.9999999999999998+/-nan;;;
