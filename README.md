@@ -169,7 +169,7 @@ You can include multiple analyses, even for the same data, in the file. An examp
 ##### Analysis Parameters Explanation
 
 - `name`: name of simulation, this needs to be the same name that was specified in the simulation parameters
-- `name for save`: name under which the analysis file (plots and fit parameters) get stored
+- `name for save`: name under which the analysis files (plots and fit parameters) get stored
 - `fit functions`: fit functions that should be exectuded on the data. `E_X_of_Y` are the conditional expectation values, `gamma1_gamma3_1/2` are the products of the two exponents, this is neceressary because here, the fits need to run with the same bootstrap samples to include the correlation between the two
 - `start bins`: left bin edge of fit range, can be specified for each fit function, `gamma1_gamma3_1/2` automatically use the fit ranges from the corresponding fit functions of the two exponents.
 - `end bins`: right bin edge of fit range, can be specified for each fit function, `gamma1_gamma3_1/2` automatically use the fit ranges from the corresponding fit functions of the two exponents.
