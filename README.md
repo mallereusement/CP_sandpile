@@ -14,7 +14,7 @@ The Sandpile Dynamics Simulator uses cellular automata to model the behavior of 
 
 **-** [**Example**](#example-usage)
 
-**-** [**Repdocing Data from Report**](#repdocing-data-from-report)
+**-** [**Reproducing Data from Report**](#reproducing-data-from-report)
 
 ## Overview
 
@@ -274,7 +274,7 @@ After this, I now want to run my analysis. I have a file with my parameters call
 python run_analysis.py simulated_data analysis_parameters.txt
 ```
 
-## Repdocing Data from Report
+## Reproducing Data from Report
 
 The data that was used for the report can be found in the file `final_data`. The data can also be reproduced by running first:
 
