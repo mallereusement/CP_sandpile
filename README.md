@@ -7,8 +7,11 @@ The Sandpile Dynamics Simulator uses cellular automata to model the behavior of 
 **## Table of Contents**
 
 **-** [**Overview**](**#overview**)
+
 **-** [**Installation**](**#installation**)
+
 **-** [**Usage**](**#usage**)
+
 **-** [**Examples**](**#examples**)
 
 ## Overview
