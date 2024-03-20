@@ -4,7 +4,7 @@
 
 The Sandpile Dynamics Simulator uses cellular automata to model the behavior of sandpiles. By randomly adding sand, the simulator demonstrates self-organized criticality, characterized by power-law distributions of avalanche lifetimes and sizes. It facilitates systematic exploration of scaling exponents for different dimensions.
 
-**## Table of Contents**
+## Table of Contents
 
 **-** [**Overview**](#overview)
 
