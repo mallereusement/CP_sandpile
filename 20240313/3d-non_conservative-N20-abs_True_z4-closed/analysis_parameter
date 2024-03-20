@@ -1,5 +1,6 @@
 {
     "name": "3d-non_conservative-N20-abs_True_z4-closed",
+    "name for save": "ana1",
     "fit functions": [
         "P_of_S",
         "P_of_T",
@@ -64,5 +65,18 @@
         "l",
         "$\\tau$",
         "f"
-    ]
+    ],
+    "ylabels": [
+        "P(S)",
+        "P(T)",
+        "P(L)",
+        "E(S|T)",
+        "E(T|S)",
+        "E(S|L)",
+        "E(L|S)",
+        "E(T|L)",
+        "E(L|T)",
+        "S(f)"
+    ],
+    "block size": 0
 }

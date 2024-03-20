@@ -6,12 +6,12 @@ from tqdm import tqdm
 
 
 df = pd.read_csv('data_for_exponent_calculation.csv', sep=';', encoding='utf8')
-min_timestep = df['timestep'].min()
-max_timestep = df['timestep'].max()
-all_timesteps = pd.DataFrame({'timestep': range(min_timestep, max_timestep + 1)})
+min_timestep = df['lifetime'].min()
+max_timestep = df['lifetime'].max()
+all_timesteps = pd.DataFrame({'lifetime': range(min_timestep, max_timestep + 1)})
 
 # Merge the original DataFrame with the DataFrame containing all possible timesteps
-df_all_timesteps = all_timesteps.merge(df, on='timestep', how='left')
+df_all_timesteps = all_timesteps.merge(df, on='lifetime', how='left')
 
 # Fill missing values with zeros
 df_all_timesteps['lifetime'] = df_all_timesteps['lifetime'].fillna(0)

@@ -288,10 +288,6 @@ with open(f'simulation_avalanche_dissipation/dissipation_sim_{type}_{boundary_co
     for line in list_avalanches:
         f.write(f'{line} \n')
 
-#sns.heatmap(crit_grid_sum, norm=LogNorm())
-#plt.text(95, 5, f'perturbation = {type} \n boundary = {boundary_condition} ', ha='right', va='top', color='white')
-#plt.show()
-
 ## write results into data frame
 df_results["lifetime"] = t_avalanche
 df_results["number"] = n_avalanche
