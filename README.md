@@ -37,7 +37,7 @@ The Sandpile Dynamics Simulator is written in Python and requires the following 
 - `numpy` for storing and manipulating the lattice
 - `iminuit` for fitting
 - `pandas` for data analysis and safe of simulated data to .csv tables
-- `uncertainties` for handling values with asigned statistical uncertatinties
+- `uncertainties` for handling values with assigned statistical uncertatinties
 - `tqdm` for progressbar of code
 - `matplotlib` for plotting
 
