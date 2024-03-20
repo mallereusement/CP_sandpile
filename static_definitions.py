@@ -1,6 +1,8 @@
 import numpy as np
 
 class exponent_functions():
+    """A class containing functions for power-law and exponential relationships."""
+
 
     def P_of_S(self, x, amp, exponent):
         return amp * np.power(x, 1 - exponent)
@@ -36,6 +38,7 @@ class exponent_functions():
         return amp * np.power(x, 1 / exponent)
     
     def __getitem__(self, name):
+        """Get a function by its name."""
         return getattr(self, name)
     
 
