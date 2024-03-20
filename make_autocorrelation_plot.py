@@ -16,4 +16,3 @@ plt.ylabel('Normalized ACF')
 plt.xlabel('time')
 plt.title('')
 plt.savefig('acf.png', dpi=300)
-

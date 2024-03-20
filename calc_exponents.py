@@ -34,7 +34,7 @@ def conditional_expectation_value(variable: str, condition: str, bins: np.ndarra
 
     expectation_list = []
     expectation_list_err = []
-
+    statistics = []
     for left_edge, right_edge in zip(bins[:-1], bins[1:]):
         list = df[(df[condition] > left_edge) & (df[condition] <= right_edge)][variable].to_numpy()
 
@@ -45,11 +45,13 @@ def conditional_expectation_value(variable: str, condition: str, bins: np.ndarra
                 
             expectation_list.append(unp.nominal_values(expectation))
             expectation_list_err.append(unp.std_devs(expectation))
+            statistics.append(len(list))
         else:
             expectation_list.append(0)   
-            expectation_list_err.append(1)     
+            expectation_list_err.append(1)
+            statistics.append(0)   
     expectation_list = unp.uarray(expectation_list, expectation_list_err)
-
+    statistics = np.array(statistics)
 
     if get_error_with_bootstrapping:
         pbar = tqdm(total = bootstrap_size, desc ="Running Bootstrap for Error Estimation of conditional expectation value")
@@ -74,12 +76,16 @@ def conditional_expectation_value(variable: str, condition: str, bins: np.ndarra
         expectation_list_bootstrap_global = np.array(expectation_list_bootstrap_global)
         stds = np.std(expectation_list_bootstrap_global, axis=0)
         #print(stds)
+        indices = np.where(stds < 1e-3)
+        one_percent_data = 0.01 * unp.nominal_values(expectation_list)
+        stds[indices] = one_percent_data[indices]
+
         expectation_list = unp.uarray(unp.nominal_values(expectation_list), stds)
 
     
 
 
-    return bin_centers, expectation_list
+    return bin_centers, expectation_list, statistics
 
 
 def exclude_outside_interval(bin_edges: np.ndarray, histogram_data: np.ndarray, x_min: int, x_max: int) -> list[np.ndarray, np.ndarray]:
@@ -128,23 +134,24 @@ def get_exponent_product_from_simulation_data_conditional_exp_value(fit_function
     product = []
 
     if fit_function == 'gamma1_gamma3_1':
-        x_org1, data_org1 = conditional_expectation_value('total dissipation', 'lifetime', bins1, df, x_limit1, get_error_with_bootstrapping=True, bootstrap_size=bootstrap_size)
+        x_org1, data_org1, _ = conditional_expectation_value('total dissipation', 'lifetime', bins1, df, x_limit1, get_error_with_bootstrapping=True, bootstrap_size=bootstrap_size)
         m_org1 = fit_data(fit_funtion_mapping[fit_function][0], x_org1, unp.nominal_values(data_org1), unp.std_devs(data_org1), starting_values)
     
-        x_org2, data_org2 = conditional_expectation_value('lifetime', 'spatial linear size', bins2, df, x_limit2, get_error_with_bootstrapping=True, bootstrap_size=bootstrap_size)
+        x_org2, data_org2, _ = conditional_expectation_value('lifetime', 'spatial linear size', bins2, df, x_limit2, get_error_with_bootstrapping=True, bootstrap_size=bootstrap_size)
         m_org2 = fit_data(fit_funtion_mapping[fit_function][1], x_org2, unp.nominal_values(data_org2), unp.std_devs(data_org2), starting_values)
     elif fit_function == 'gamma1_gamma3_2':
-        x_org1, data_org1 = conditional_expectation_value('lifetime', 'total dissipation', bins1, df, x_limit1, get_error_with_bootstrapping=True, bootstrap_size=bootstrap_size)
+        x_org1, data_org1, _ = conditional_expectation_value('lifetime', 'total dissipation', bins1, df, x_limit1, get_error_with_bootstrapping=True, bootstrap_size=bootstrap_size)
         m_org1 = fit_data(fit_funtion_mapping[fit_function][0], x_org1, unp.nominal_values(data_org1), unp.std_devs(data_org1), starting_values)
     
-        x_org2, data_org2 = conditional_expectation_value('spatial linear size', 'lifetime', bins2, df, x_limit2, get_error_with_bootstrapping=True, bootstrap_size=bootstrap_size)
+        x_org2, data_org2, _ = conditional_expectation_value('spatial linear size', 'lifetime', bins2, df, x_limit2, get_error_with_bootstrapping=True, bootstrap_size=bootstrap_size)
         m_org2 = fit_data(fit_funtion_mapping[fit_function][1], x_org2, unp.nominal_values(data_org2), unp.std_devs(data_org2), starting_values)
     valid_counter = 0
+    pbar = tqdm(total = bootstrap_size, desc ="Running Bootstrap for Error Estimation of fit parameters")
     for sample in samples:
         if fit_function == 'gamma1_gamma3_1':      
-            x1, data1 = conditional_expectation_value('total dissipation', 'lifetime', bins1, sample, x_limit1)
+            x1, data1, _ = conditional_expectation_value('total dissipation', 'lifetime', bins1, sample, x_limit1)
             m1 = fit_data('E_of_S_T', x1, unp.nominal_values(data1), unp.std_devs(data_org1), starting_values)
-            x2, data2 = conditional_expectation_value('lifetime', 'spatial linear size', bins2, sample, x_limit2)
+            x2, data2, _ = conditional_expectation_value('lifetime', 'spatial linear size', bins2, sample, x_limit2)
             m2 = fit_data('E_of_T_L', x2, unp.nominal_values(data2), unp.std_devs(data_org2), starting_values)
             if (m1.valid == True) and (m2.valid == True):
                 valid_counter = valid_counter + 1
@@ -152,22 +159,24 @@ def get_exponent_product_from_simulation_data_conditional_exp_value(fit_function
                 parameter_amp2, parameter_exp2 = m2.values['amp'], m2.values['exponent']
                 product.append(parameter_exp1*parameter_exp2)
         elif fit_function == 'gamma1_gamma3_2':
-            x1, data1 = conditional_expectation_value('lifetime', 'total dissipation', bins1, sample, x_limit1)
+            x1, data1, _ = conditional_expectation_value('lifetime', 'total dissipation', bins1, sample, x_limit1)
             m1 = fit_data('E_of_S_T', x1, unp.nominal_values(data1), unp.std_devs(data_org1), starting_values)
-            x2, data2 = conditional_expectation_value('spatial linear size', 'lifetime', bins2, sample, x_limit2)
+            x2, data2, _ = conditional_expectation_value('spatial linear size', 'lifetime', bins2, sample, x_limit2)
             m2 = fit_data('E_of_T_L', x2, unp.nominal_values(data2), unp.std_devs(data_org2), starting_values)
             if (m1.valid == True) and (m2.valid == True):
                 valid_counter = valid_counter + 1
                 parameter_amp1, parameter_exp1 = m1.values['amp'], m1.values['exponent']
                 parameter_amp2, parameter_exp2 = m2.values['amp'], m2.values['exponent']
-                product.append(parameter_exp1*parameter_exp2)           
+                product.append(parameter_exp1*parameter_exp2)        
+        pbar.update(1)
+    pbar.close()   
 
     product = np.array(product)
     org_product = m_org1.values['exponent'] * m_org2.values['exponent']
 
     std = np.std(product)
-
-    return {"product": unc.ufloat(org_product, std), "products_from_bootstrap": product, "samples": samples, "number_of_valid_fits": valid_counter}
+    print(product)
+    return {"chi_square1": m_org1.fval, "degrees_of_freedom1": m_org1.ndof, "chi_square2": m_org2.fval, "degrees_of_freedom2": m_org2.ndof, "product": unc.ufloat(org_product, std), "products_from_bootstrap": product, "samples": samples, "number_of_valid_fits": valid_counter}
 
 
 
@@ -191,23 +200,25 @@ def get_exponent_from_simulation_data_conditional_exp_value(fit_function: str, b
 
     parameters_amp = []
     parameters_exp = []
-    x_org, data_org = conditional_expectation_value(variable, condition, bins, df, x_limit, get_error_with_bootstrapping=True, bootstrap_size=bootstrap_size)
+    x_org, data_org, _ = conditional_expectation_value(variable, condition, bins, df, x_limit, get_error_with_bootstrapping=True, bootstrap_size=bootstrap_size)
     m_org = fit_data(fit_function, x_org, unp.nominal_values(data_org), unp.std_devs(data_org), starting_values)
-
+    pbar = tqdm(total = bootstrap_size, desc ="Running Bootstrap for Error Estimation of fit parameters")
     for sample in samples:
-        x, data = conditional_expectation_value(variable, condition, bins, sample, x_limit)
+        x, data, _ = conditional_expectation_value(variable, condition, bins, sample, x_limit)
         m = fit_data(fit_function, x, unp.nominal_values(data), unp.std_devs(data_org), starting_values)
+        pbar.update(1)
         if m.valid:
             parameter_amp, parameter_exp = m.values['amp'], m.values['exponent']
             parameters_amp.append(parameter_amp)
             parameters_exp.append(parameter_exp)
-
+    pbar.close()
     parameters_amp = np.array(parameters_amp)
     parameters_exp = np.array(parameters_exp)
 
     cov_mat = np.cov(np.stack((parameters_amp, parameters_exp), axis = 0))
+    print(parameters_exp)
 
-    return {"exponent_values_from_bootrstrap": parameters_exp, "parameters": [unc.ufloat(m_org.values['amp'], cov_mat[0,0]**0.5), unc.ufloat(m_org.values['exponent'], cov_mat[1,1]**0.5)], "covariance_matrix": cov_mat, "x": x, "data": unp.nominal_values(data_org), "errors": unp.std_devs(data_org), "model": fit_functions[fit_function](x, m_org.values['amp'], m_org.values['exponent']), "samples": samples}
+    return {"chi_square": m_org.fval, "degrees_of_freedom": m_org.ndof, "exponent_values_from_bootrstrap": parameters_exp, "parameters": [unc.ufloat(m_org.values['amp'], cov_mat[0,0]**0.5), unc.ufloat(m_org.values['exponent'], cov_mat[1,1]**0.5)], "covariance_matrix": cov_mat, "x": x, "data": unp.nominal_values(data_org), "errors": unp.std_devs(data_org), "model": fit_functions[fit_function](x, m_org.values['amp'], m_org.values['exponent']), "samples": samples}
 
 
 def generate_following_indices(indices, n):
@@ -267,6 +278,9 @@ def get_exponent_from_simulation_data(fit_function: str, bins: np.ndarray, df: p
     hist_data = [np.histogram(i[variable], bins=bins)[0] for i in samples]
     samples = np.array([i for i in hist_data])
     errors = np.std(samples, axis=0)
+    indices = np.where(errors < 1e-4)
+    one_percent_data = 0.01 * data
+    errors[indices] = one_percent_data[indices]
     parameters_amp = []
     parameters_exp = []
     m_org = fit_data(fit_function, bin_centers, data, errors, starting_values)
@@ -283,10 +297,11 @@ def get_exponent_from_simulation_data(fit_function: str, bins: np.ndarray, df: p
 
     parameters_amp = np.array(parameters_amp)
     parameters_exp = np.array(parameters_exp)
+    print(parameters_exp)
 
     cov_mat = np.cov(np.stack((parameters_amp, parameters_exp), axis = 0))
 
-    return {"exponent_values_from_bootrstrap": parameters_exp, "parameters": [unc.ufloat(m_org.values['amp'], cov_mat[0,0]**0.5), unc.ufloat(m_org.values['exponent'], cov_mat[1,1]**0.5)], "covariance_matrix": cov_mat, "x": bin_centers, "data": data, "errors": errors, "model": fit_functions[fit_function](bin_centers, m_org.values['amp'], m_org.values['exponent']), "samples": samples}
+    return {"chi_square": m_org.fval, "degrees_of_freedom": m_org.ndof, "exponent_values_from_bootrstrap": parameters_exp, "parameters": [unc.ufloat(m_org.values['amp'], cov_mat[0,0]**0.5), unc.ufloat(m_org.values['exponent'], cov_mat[1,1]**0.5)], "covariance_matrix": cov_mat, "x": bin_centers, "data": data, "errors": errors, "model": fit_functions[fit_function](bin_centers, m_org.values['amp'], m_org.values['exponent']), "samples": samples}
 
 
 def fit_data(fit_function: str, x:np.ndarray, data: np.ndarray, errors: np.ndarray, starting_values: list) -> float:
@@ -332,7 +347,7 @@ def save_exponent_data(fit_function: str, bins: dict, bootstrap_size: str, fit_r
     #    bins_count = len(fit_parameter['bins'])
     if bins2 == False:
         bins = get_bins_from_parameter_settings(*bins)
-        temp_df = pd.DataFrame({'fit function': [fit_function], 'variable': [fit_funtion_mapping[fit_function][0]], 'condition': [fit_funtion_mapping[fit_function][1]], 'left bin edge': [bins[0]], 'right bin edge': [bins[-1]], 'count of bins': [len(bins)-1], 'bootstrap size': [bootstrap_size], 'amplitude from fit result': [fit_results['parameters'][0]], 'exponent from fit result': [fit_results['parameters'][1]], 'covariance c_11': [fit_results['covariance_matrix'][0,0]], 'covariance c_12': [fit_results['covariance_matrix'][0,1]], 'covariance c_22': [fit_results['covariance_matrix'][1,1]]})
+        temp_df = pd.DataFrame({'chi_square': [fit_results['chi_square']], 'degrees_of_freedom': [fit_results['degrees_of_freedom']], 'fit function': [fit_function], 'variable': [fit_funtion_mapping[fit_function][0]], 'condition': [fit_funtion_mapping[fit_function][1]], 'left bin edge': [bins[0]], 'right bin edge': [bins[-1]], 'count of bins': [len(bins)-1], 'bootstrap size': [bootstrap_size], 'amplitude from fit result': [fit_results['parameters'][0]], 'exponent from fit result': [fit_results['parameters'][1]], 'covariance c_11': [fit_results['covariance_matrix'][0,0]], 'covariance c_12': [fit_results['covariance_matrix'][0,1]], 'covariance c_22': [fit_results['covariance_matrix'][1,1]]})
         
         if not file_to_load:
             temp_df.to_csv(file_to_save, sep=';', encoding='utf8', index=False)
@@ -343,7 +358,7 @@ def save_exponent_data(fit_function: str, bins: dict, bootstrap_size: str, fit_r
     else:
         bins = get_bins_from_parameter_settings(*bins)
         bins2 = get_bins_from_parameter_settings(*bins2)
-        temp_df = pd.DataFrame({'fit function': [fit_function], 'left bin edge 1': [bins[0]], 'right bin edge 1': [bins[-1]], 'count of bins 1': [len(bins)-1], 'left bin edge 2': [bins2[0]], 'right bin edge 2': [bins2[-1]], 'count of bins 2': [len(bins2)-1], 'bootstrap size': [bootstrap_size], 'product from fit result': [fit_results['product']], 'number of valid fits': [fit_results['number_of_valid_fits']]})
+        temp_df = pd.DataFrame({'chi_square1': [fit_results['chi_square1']], 'degrees_of_freedom1': [fit_results['degrees_of_freedom1']], 'chi_square2': [fit_results['chi_square2']], 'degrees_of_freedom2': [fit_results['degrees_of_freedom2']], 'fit function': [fit_function], 'left bin edge 1': [bins[0]], 'right bin edge 1': [bins[-1]], 'count of bins 1': [len(bins)-1], 'left bin edge 2': [bins2[0]], 'right bin edge 2': [bins2[-1]], 'count of bins 2': [len(bins2)-1], 'bootstrap size': [bootstrap_size], 'product from fit result': [fit_results['product']], 'number of valid fits': [fit_results['number_of_valid_fits']]})
         
         if not file_to_load:
             temp_df.to_csv(file_to_save, sep=';', encoding='utf8', index=False)
@@ -367,7 +382,7 @@ def load_simulation_data(sim_data: dict) -> pd.DataFrame:
 
 
 def get_bins_from_parameter_settings(start_bin: int, end_bin: int, bin_width: int):
-     return np.linspace(start_bin, end_bin, int((end_bin-start_bin) / float(bin_width)))
+     return np.linspace(start_bin, end_bin, int((end_bin-start_bin) / float(bin_width) + 1))
 
 
 fit_funtion_mapping = {
