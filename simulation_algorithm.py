@@ -38,22 +38,24 @@ def detect_steady_state(data, window_size=20, confidence_level=0.99):
     return False  # Steady state not reached within the given data
 
 def set_bound_0(grid: np.ndarray, N: int, boundary: str='open', d: int=2) -> np.ndarray:
-    """set all borders to 0
+    """Set all borders to 0 as per the specified boundary condition.
 
     Args:
-        grid (np.ndarray): current grid
-        N (int): number of rows/columns of the grid
-        boundary (str, optional): type of boundary condition used, takes 'open' and 'closed'. Defaults to 'open'.
-        d (int, optional): Dimension of Grid. Defaults to 2.
+        grid (np.ndarray): Current grid.
+        N (int): Size of the grid.
+        boundary (str, optional): Type of boundary condition used. Defaults to 'open'.
+                                  It can take values 'open' and 'closed'.
+        d (int, optional): Dimension of the grid. Defaults to 2.
 
     Returns:
-        np.ndarray: grid with the boundary condition applied (with borders set to 0)
+        np.ndarray: Grid with the boundary condition applied (with borders set to 0).
     """
+    # Set borders to 0 for each axis
     for axis in range(d):
         slices = [slice(None)] * d
         slices[axis] = 0
         grid[tuple(slices)] = 0
-
+    # If boundary is 'closed', set the opposite borders to 0 as well
     if boundary == 'closed':
         for axis in range(d):
             slices = [slice(None)] * d
@@ -62,81 +64,100 @@ def set_bound_0(grid: np.ndarray, N: int, boundary: str='open', d: int=2) -> np.
     return grid
 
 def generate_unit_vecs(d:int) -> list:
-    empty = np.zeros(d, dtype=int)
+    """Generate unit vectors in d-dimensional space.
 
+    Args:
+        d (int): Dimension of the space.
+
+    Returns:
+        list: List of unit vectors in the specified dimension.
+    """
+    # Create an empty vector
+    empty = np.zeros(d, dtype=int)
+    # Initialize a list to store unit vectors
     vectors = []
+    # Generate unit vectors along each axis
     for i in range(d):
         vec = copy.copy(empty)
+        # Set the current axis to 1 to generate the unit vector
         vec[i] = 1
         vectors.append(vec)
     return vectors
            
 def set_up_grid(N: int, d: int=2) -> np.ndarray:
-    """Generates flat grid 
+    """Generates a grid with zeros.
 
     Args:
-        N (int): Size of grid in one axis
-        d (int, optional): Dimension of Grid. Defaults to 2.
+        N (int): Size of the grid in one axis.
+        d (int, optional): Dimension of the grid. Defaults to 2.
 
     Returns:
-        np.ndarray: grid
+        np.ndarray: Grid initialized with zeros.
     """
     shape = tuple([N] * d)
     return np.zeros(shape=shape)
 
 def pertubation_mech(grid: np.ndarray, N: int, p: np.ndarray, d:int=2, type: str = 'conservative', boundary_condition: str = 'open') -> np.ndarray:  
-    """applies a pertubation to a specific point in the grid
+    """Applies a perturbation to a specific point in the grid.
 
     Args:
-        grid (np.ndarray): current grid
-        N (int): number of rows/columns of the grid
-        type (str, optional): type of perturbation, takes 'conservative' or 'non_conservative'. Defaults to 'conservative'.
-        boundary_condition (str, optional): type of boundary condition used, takes 'open' and 'closed'. Defaults to 'open'.
-        px: x-position of the perturbation
-        py: y-position of the perturbation
+        grid (np.ndarray): Current grid.
+        N (int): Size of the grid.
+        p (np.ndarray): Position of the perturbation.
+        d (int, optional): Dimension of the grid. Defaults to 2.
+        type (str, optional): Type of perturbation, takes 'conservative' or 'non_conservative'. Defaults to 'conservative'.
+        boundary_condition (str, optional): Type of boundary condition used, takes 'open' and 'closed'. Defaults to 'open'.
 
     Returns:
-        np.ndarray: grid with the perturbation applied
+        np.ndarray: Grid with the perturbation applied.
     """
-    
+    # Randomly set position if not provided
     p[p==False] = np.random.randint(1,N)
 
     if type == 'conservative':
+        # Apply conservative perturbation
         grid[tuple(p)] += d 
         vecs = generate_unit_vecs(d)
         for i in range(d):
             grid[tuple(p-vecs[i])] -= 1
               
     if type == 'non_conservative':
-        grid[tuple(p)] += 1    
-    
+        # Apply non-conservative perturbation
+        grid[tuple(p)] += 1
+
+    # Apply boundary condition
     grid = set_bound_0(grid, N, boundary_condition, d=d)
     return grid
 
 def relax(grid, N, crit_val, boundary_condition='open', use_abs_val=False, d:int=2) -> np.ndarray:   
-    """relaxation applied to the grid (only one time)
+    """Applies relaxation to the grid.
 
     Args:
-        grid (np.ndarray): current grid
-        N (int): number of rows/columns of the grid
-        crit_val (int): value of the critical slope
-        boundary_condition (str, optional): type of boundary condition used, takes 'open' and 'closed'. Defaults to 'open'.
-        use_abs_val (bool, optional): Determines wether the condition |z| > z_crit or z > z_crit is used. Defaults to False. (for the latter case)
+        grid (np.ndarray): Current grid.
+        N (int): Size of the grid.
+        crit_val (int): Value of the critical slope.
+        boundary_condition (str, optional): Type of boundary condition used, takes 'open' and 'closed'. Defaults to 'open'.
+        use_abs_val (bool, optional): Determines whether the condition |z| > z_crit or z > z_crit is used. Defaults to False (for the latter case).
+        d (int, optional): Dimension of the grid. Defaults to 2.
 
     Returns:
-        np.ndarray: relaxed grid
+        np.ndarray: Relaxed grid.
     """
+    # Set boundary condition
     grid = set_bound_0(grid, N, boundary_condition, d)
-    
+
+    # Determine mask based on use_abs_val
     if use_abs_val:
         mask = np.where(abs(grid) > crit_val)
     else:
         mask = np.where(grid > crit_val)
-    
+
+    # Apply relaxation to each point in the mask
     for i in range(len(mask[0])):   
         vecs = generate_unit_vecs(d)
         p = np.array(mask)[:, i]
 
+        # |z| > z_crit
         if use_abs_val:
             if grid[tuple(p)] > 0:
                 grid[tuple(p)] += -2*d + sum([1 if mask[j][i] == N-1 else 0 for j in range(0,d)])
@@ -153,8 +174,9 @@ def relax(grid, N, crit_val, boundary_condition='open', use_abs_val=False, d:int
                 for j in range(d):
                     if p[j] < N-1:
                         grid[tuple(p + vecs[j])] -= 1
-                    grid[tuple(p - vecs[j])] -= 1     
+                    grid[tuple(p - vecs[j])] -= 1   
 
+        # z > z_crit
         else:
             if grid[tuple(p)] > 0:
                 grid[tuple(p)] += -2*d + sum([1 if mask[j][i] == N-1 else 0 for j in range(0,d)])
@@ -163,40 +185,65 @@ def relax(grid, N, crit_val, boundary_condition='open', use_abs_val=False, d:int
                     if p[j] < N-1:
                         grid[tuple(p + vecs[j])] += 1
                     grid[tuple(p - vecs[j])] += 1         
-    
+    # Set boundary condition again and return the relaxed grid
     grid = set_bound_0(grid, N, boundary_condition, d)
     return grid
 
 def spatial_linear_distance(crit_grid, p:tuple, d:int=2) -> float:
-    """_summary_
+    """Calculates the distance between the point of pertubation and the point furthest away but still reached by the avalanche.
 
     Args:
-        crit_grid (_type_): _description_
-        px (_type_): _description_
-        py (_type_): _description_
+        crit_grid (np.ndarray): Grid indicating critical sites.
+        p (tuple): Coordinates of the point.
+        d (int, optional): Dimension of the grid. Defaults to 2.
 
     Returns:
-        float: _description_
+        float: Maximum spatial linear distance
     """
+    # Find coordinates of critical sites
     truth = np.where(crit_grid >= 1)
     
     dist = []
+    # Calculate distances to each critical site
     for i in range(len(truth[0])):
         pos = np.array(truth)[:, i]
         dist.append(np.sqrt(np.dot(p-pos, p-pos)))
+    # Return the maximum distance
     return np.max(dist)
 
 
 def write_data_for_power_spectrum_to_file(filepath: str, filename: str, list_of_avalanches :list) -> None:
+    """Write avalanche data to a text file for power spectrum calculation.
+
+    Args:
+        filepath (str): Path to the directory where the file will be saved.
+        filename (str): Name of the file to be saved.
+        list_of_avalanches (list): List of avalanche data to be written to the file.
+    """
     with open(f'{filepath}/{filename}.txt', 'w') as f:
         for line in list_of_avalanches:
             f.write(f'{line} \n')
 
 def write_data_for_exponent_calculation_to_file(filepath: str, filename: str, data: dict) -> None:
+    """Write data for exponent calculation to a CSV file.
+
+    Args:
+        filepath (str): Path to the directory where the file will be saved.
+        filename (str): Name of the file to be saved.
+        data (dict): Dictionary containing the data to be written to the file.
+                     Keys represent column names, and values represent lists of data for each column.
+    """
     df = pd.DataFrame(data)
     df.to_csv(f'{filepath}/{filename}.csv', sep=';', encoding='utf8')
 
 def plot_heatmap(crit_grid_sum, type, boundary_condition):
+    """Plot heatmap of the summed critical grid.
+
+    Args:
+        crit_grid_sum (np.ndarray): Summed critical grid data to be plotted.
+        type (str): Type of perturbation applied.
+        boundary_condition (str): Type of boundary condition used.
+    """
     fig, ax = plt.subplots(figsize=(6,5))
     
     sns.heatmap(crit_grid_sum)#, norm=LogNorm())
@@ -206,6 +253,16 @@ def plot_heatmap(crit_grid_sum, type, boundary_condition):
 
 
 def run_simulation(simulation_parameter: dict, filepath_datastorage: str, simulation_name: str):
+    """Runs a sandpile simulation based on the provided parameters.
+
+    Args:
+        simulation_parameter (dict): Dictionary containing simulation parameters.
+        filepath_datastorage (str): Path to the directory where simulation data will be stored.
+        simulation_name (str): Name of the simulation.
+
+    Returns:
+        None
+    """
 
     ### Set simulation parameter ######################################################
     N = simulation_parameter['size of grid']
@@ -219,7 +276,7 @@ def run_simulation(simulation_parameter: dict, filepath_datastorage: str, simula
     track_after_steady_state = simulation_parameter['track avalanches after steady state']
     if track_after_steady_state: # Start data acquisition after steady state is reached 
         mean_tracker = []
-    steady_state = simulation_parameter['steady state']
+    steady_state = simulation_parameter['steady state'] # Point where steady state is reached
     if steady_state > 0:
         track_after_steady_state = True
     ###################################################################################
