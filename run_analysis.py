@@ -70,12 +70,17 @@ if __name__ == '__main__':
             ## plot z-means and save plot
             plotting.nice_plot(times*1e-5, means, 't/$10^5$', '<z>', xmin=-0.01, xmax=2,  log=False)
             #plt.savefig('./' + f'{filepath_datastorage}/{analysis_parameters[parameter]["name"]}/plots_{analysis_parameters[parameter]["name for save"]}/z_means.jpg', dpi=300)
+            os.mkdir('./' + f'{filepath_datastorage}/plots/{analysis_parameters[parameter]["name"]}/{analysis_parameters[parameter]["name for save"]}')
             plt.savefig('./' + f'{filepath_datastorage}/plots/{analysis_parameters[parameter]["name"]}/{analysis_parameters[parameter]["name for save"]}/z_means.jpg', dpi=300)
 
 
-        run_sandpile.save_simulation_parameters('./' + f'{filepath_datastorage}/{analysis_parameters[parameter]["name"]}/analysis_parameter', analysis_parameters[parameter])
+        run_sandpile.save_simulation_parameters('./' + f'{filepath_datastorage}/{analysis_parameters[parameter]["name"]}/analysis_parameter_{analysis_parameters[parameter]["name for save"]}', analysis_parameters[parameter])
+        try:
+            os.mkdir('./' + f'{filepath_datastorage}/results/{analysis_parameters[parameter]["name"]}')
+            os.mkdir('./' + f'{filepath_datastorage}/results/{analysis_parameters[parameter]["name"]}/{analysis_parameters[parameter]["name for save"]}')
+        except:
+            os.mkdir('./' + f'{filepath_datastorage}/results/{analysis_parameters[parameter]["name"]}/{analysis_parameters[parameter]["name for save"]}')
         
-        os.mkdir('./' + f'{filepath_datastorage}/results/{analysis_parameters[parameter]["name"]}')
         
         
 
@@ -88,7 +93,7 @@ if __name__ == '__main__':
             T = analysis_parameters[parameter]['power spectrum T']
             power_spectrum_, freq = power_spectrum.calculate_power_spectrum(max_length, R, T, N, l)
             df_power_spectrum = pd.DataFrame({'frequency': freq, 'power spectrum': power_spectrum_})
-            df_power_spectrum.to_csv(f'{filepath_datastorage}/results/{analysis_parameters[parameter]["name"]}/power_spectrum.csv', sep=';', encoding='utf8', index=False)
+            df_power_spectrum.to_csv(f'{filepath_datastorage}/results/{analysis_parameters[parameter]["name"]}/{analysis_parameters[parameter]["name for save"]}/power_spectrum.csv', sep=';', encoding='utf8', index=False)
             idx = analysis_parameters[parameter]['fit functions'].index('S_of_f')
             # To Do: Exponent calculation
             if analysis_parameters[parameter]['save plots']:

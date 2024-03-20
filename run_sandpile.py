@@ -43,13 +43,15 @@ if __name__ == '__main__':
     filepath_datastorage = args.path
     file_path = args.simulation_paramter_file
     simulation_parameters = read_simulation_parameters(file_path, format_int, format_bool)
-    #os.mkdir('./' + args.path)
+    os.mkdir('./' + args.path)
+    os.mkdir('./' + args.path + f'/plots')  ## 
     #os.mkdir('./' + args.path + f'/plots/')  ## create folder to store plots in
 
     for parameter in simulation_parameters:
        
         os.mkdir('./' + args.path + f'/{simulation_parameters[parameter]["name"]}')   ## create path for specific simulation
         os.mkdir('./' + args.path + f'/{simulation_parameters[parameter]["name"]}/simulation_data')  ## create folder to store simulation data in
+        
         os.mkdir('./' + args.path + f'/plots/{simulation_parameters[parameter]["name"]}')  ## create folder for the specific simulation
         
         save_simulation_parameters('./' + args.path + f'/{simulation_parameters[parameter]["name"]}/simulation_data/simulation_parameter', simulation_parameters[parameter])
