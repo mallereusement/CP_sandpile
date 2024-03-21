@@ -274,7 +274,7 @@ After the simulation finished, run:
 python run_analysis.py final_data_reproduced analysis_parameters.txt
 ```
 
-After the analysis finished, run the analysis to get uper and lower bounds for exponents (systematic uncertainties):
+After the analysis finished, run the analysis to get upper and lower bounds for exponents (systematic uncertainties):
 
 ```bash
 python run_analysis.py final_data_reproduced analysis_parameters_systematics.txt
