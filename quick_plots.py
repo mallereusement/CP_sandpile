@@ -4,7 +4,7 @@ import pandas as pd
 import calc_exponents
 from uncertainties import unumpy as unp
 
-df = pd.read_csv('final_data2/2d-non_conservative-N40-abs_True_z4-closed/simulation_data/data_for_exponent_calculation.csv', sep=';')
+df = pd.read_csv('final_data2/3d-non_conservative-N20-abs_True_z4-closed/simulation_data/data_for_exponent_calculation.csv', sep=';')
 fit_funtion_mapping = {
     'P_of_S': ['total dissipation', '-'],
     'P_of_T': ['lifetime', '-'],

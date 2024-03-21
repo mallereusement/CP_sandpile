@@ -207,7 +207,7 @@ def get_exponent_product_from_simulation_data_conditional_exp_value(fit_function
     org_product = m_org1.values['exponent'] * m_org2.values['exponent']
     # Calculate uncertainties
     std = np.std(product)
-    print(product)
+    
     return {"chi_square1": m_org1.fval, "degrees_of_freedom1": m_org1.ndof, "chi_square2": m_org2.fval, "degrees_of_freedom2": m_org2.ndof, "product": unc.ufloat(org_product, std), "products_from_bootstrap": product, "samples": samples, "number_of_valid_fits": valid_counter}
 
 
@@ -255,8 +255,7 @@ def get_exponent_from_simulation_data_conditional_exp_value(fit_function: str, b
     parameters_exp = np.array(parameters_exp)
     # Calculate covariance matrix
     cov_mat = np.cov(np.stack((parameters_amp, parameters_exp), axis = 0))
-    print(parameters_exp)
-
+    
     return {"chi_square": m_org.fval, "degrees_of_freedom": m_org.ndof, "exponent_values_from_bootrstrap": parameters_exp, "parameters": [unc.ufloat(m_org.values['amp'], cov_mat[0,0]**0.5), unc.ufloat(m_org.values['exponent'], cov_mat[1,1]**0.5)], "covariance_matrix": cov_mat, "x": x, "data": unp.nominal_values(data_org), "errors": unp.std_devs(data_org), "model": fit_functions[fit_function](x, m_org.values['amp'], m_org.values['exponent']), "samples": samples}
 
 
@@ -360,7 +359,7 @@ def get_exponent_from_simulation_data(fit_function: str, bins: np.ndarray, df: p
 
     parameters_amp = np.array(parameters_amp)
     parameters_exp = np.array(parameters_exp)
-    print(parameters_exp)
+    
     # Calculate covariance matrix
     cov_mat = np.cov(np.stack((parameters_amp, parameters_exp), axis = 0))
 

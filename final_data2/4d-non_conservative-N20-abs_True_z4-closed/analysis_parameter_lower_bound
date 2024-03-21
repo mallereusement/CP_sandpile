@@ -1,0 +1,35 @@
+{
+    "name": "4d-non_conservative-N20-abs_True_z4-closed",
+    "name for save": "lower_bound",
+    "fit functions": [
+        "P_of_S",
+        "S_of_f"
+    ],
+    "end bins": [
+        20.5,
+        10.0
+    ],
+    "start bins": [
+        1.5,
+        2.0
+    ],
+    "bin width": [
+        1,
+        1
+    ],
+    "save plots": true,
+    "power spectrum R": 10,
+    "power spectrum T": 100,
+    "power spectrum N": 1000,
+    "bootstrap size": 200,
+    "xlabels": [
+        "s",
+        "rg"
+    ],
+    "ylabels": [
+        "P(S)",
+        "gwop"
+    ],
+    "max t for z_mean": 12,
+    "block size": 0
+}

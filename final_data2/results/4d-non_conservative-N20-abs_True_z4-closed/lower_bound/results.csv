@@ -1,0 +1,2 @@
+chi_square;degrees_of_freedom;fit function;variable;condition;left bin edge;right bin edge;count of bins;bootstrap size;amplitude from fit result;exponent from fit result;covariance c_11;covariance c_12;covariance c_22
+18.205860704980598;17.0;P_of_S;total dissipation;-;1.5;20.5;19;200;(7.3+/-0.9)e+03;2.38+/-0.27;809908.2956144838;238.47465906019923;0.07112496938671029
