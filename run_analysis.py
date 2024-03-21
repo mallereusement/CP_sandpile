@@ -39,7 +39,7 @@ def read_analysis_parameters(file_path, format_bool, format_list, format_int) ->
 
 format_bool = ['save plots']
 format_list = ['start bins', 'end bins', 'bin width']
-format_int = ['power spectrum R', 'power spectrum T', 'power spectrum N', 'bootstrap size', 'block size']
+format_int = ['power spectrum R', 'power spectrum T', 'power spectrum N', 'bootstrap size', 'block size', 'max t for z_mean']
 format_list_str = ['fit functions', 'xlabels', 'ylabels']
 
 if __name__ == '__main__':
@@ -58,18 +58,13 @@ if __name__ == '__main__':
     for parameter in analysis_parameters:            
             
         if analysis_parameters[parameter]['save plots']:
-            #os.mkdir('./' + f'{filepath_datastorage}/{analysis_parameters[parameter]["name"]}/plots_{analysis_parameters[parameter]["name for save"]}')  ## create folder to store plots 
-            
-            #os.mkdir('./' + f'{filepath_datastorage}/plots/{analysis_parameters[parameter]["name"]}')
-            
             ## load data for z-means:
             means_df = pd.read_csv(f'{filepath_datastorage}/{analysis_parameters[parameter]["name"]}/simulation_data/data_mean.csv', sep=';', encoding='utf8')
             means = means_df['mean'].to_numpy()
             times = means_df['time'].to_numpy()
 
             ## plot z-means and save plot
-            plotting.nice_plot(times*1e-5, means, 't/$10^5$', '<z>', xmin=-0.01, xmax=2,  log=False)
-            #plt.savefig('./' + f'{filepath_datastorage}/{analysis_parameters[parameter]["name"]}/plots_{analysis_parameters[parameter]["name for save"]}/z_means.jpg', dpi=300)
+            plotting.nice_plot(times*1e-5, means, 't/$10^5$', '<z>', xmin=-0.01, xmax=analysis_parameters[parameter]["max t for z_mean"],  log=False)
             os.mkdir('./' + f'{filepath_datastorage}/plots/{analysis_parameters[parameter]["name"]}/{analysis_parameters[parameter]["name for save"]}')
             plt.savefig('./' + f'{filepath_datastorage}/plots/{analysis_parameters[parameter]["name"]}/{analysis_parameters[parameter]["name for save"]}/z_means.jpg', dpi=300)
 
