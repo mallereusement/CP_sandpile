@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 import os
-
+# File can average mutliple fits
 
 def read_dataframes(path, t):
 
