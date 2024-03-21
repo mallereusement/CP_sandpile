@@ -1,3 +1,0 @@
-chi_square1;degrees_of_freedom1;chi_square2;degrees_of_freedom2;fit function;left bin edge 1;right bin edge 1;count of bins 1;left bin edge 2;right bin edge 2;count of bins 2;bootstrap size;product from fit result;number of valid fits
-inf;997.0;inf;997.0;gamma1_gamma3_1;1.0;1000.0;999;1.0;1000.0;999;50;0.9999999999999996+/-nan;0
-inf;997.0;inf;997.0;gamma1_gamma3_2;1.0;1000.0;999;1.0;1000.0;999;50;0.9999999999999996+/-nan;0
