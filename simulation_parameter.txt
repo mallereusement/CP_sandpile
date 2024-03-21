@@ -128,7 +128,7 @@
     - save file for exponent calculation: True
     - save mean value of grid: True
 
-    - setting09
+- setting09
     - name: 2d-non_conservative-N40-abs_True_z4-closed
     - dimension:   2
     - size of grid: 40
