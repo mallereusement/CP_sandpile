@@ -1,3 +1,3 @@
 chi_square1;degrees_of_freedom1;chi_square2;degrees_of_freedom2;fit function;left bin edge 1;right bin edge 1;count of bins 1;left bin edge 2;right bin edge 2;count of bins 2;bootstrap size;product from fit result;number of valid fits
-391.8127229862937;245.0;219.11370022834356;65.0;gamma1_gamma3_1;3.5;250.5;247;3.5;70.5;67;200;1.940+/-0.006;200
-316.43750292512124;244.0;337.47292115980514;193.0;gamma1_gamma3_2;4.5;250.5;246;5.5;200.5;195;200;1.8928+/-0.0017;200
+391.2930970330147;245.0;216.77159824037471;65.0;gamma1_gamma3_1;3.5;250.5;247;3.5;70.5;67;200;1.941+/-0.007;200
+334.7254010228605;244.0;353.40635919350063;193.0;gamma1_gamma3_2;4.5;250.5;246;5.5;200.5;195;200;1.8964+/-0.0026;200
