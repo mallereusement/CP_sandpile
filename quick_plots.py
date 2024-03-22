@@ -17,6 +17,8 @@ fit_funtion_mapping = {
     'E_of_L_T': ['spatial linear size', 'lifetime']
 }
 
+function_names = ['N(S=s)', 'N(T=$t_l$)', 'N(L=l)', 'E(S|T=$t_l$)', 'E(T|S=s)', 'E(S|L=l)', 'E(L|S=s)', 'E(T|L=l)', 'E(L|T=$t_l$)']
+function_vars = ['s', '$t_l', 'l', '$t_l$', 's', 'l', 's', 'l', '$t_l$', 'f']
 
 #time = df['time'].to_numpy()
 #mean = df['mean'].to_numpy()
@@ -24,28 +26,24 @@ fit_funtion_mapping = {
 #plt.plot(time, mean)
 #plt.show()
 
-for function in fit_funtion_mapping:
+for i, function in enumerate(fit_funtion_mapping):
 
     variable = fit_funtion_mapping[function][0]
     condition = fit_funtion_mapping[function][1]
     
     if condition == '-':
-        hist, _ = np.histogram(df[variable], bins=np.arange(0,400))
-        plt.plot(np.arange(1,399),hist[1:])
-        try:
-            plt.axvline(np.min(np.where(hist[1:]==0)))
-        except:
-            pass
+        bin_list = np.arange(0,max(df[variable]))
+        hist, _ = np.histogram(df[variable], bins=bin_list)
+        plt.plot(bin_list[1:-1],hist[1:], color='blue')
     else:
         x, result, _ = calc_exponents.conditional_expectation_value(variable, condition, np.arange(0.5, max(df[condition])+0.5, 1), df)
         result = unp.nominal_values(result)
-        plt.scatter(x, result)
-        try:
-            plt.axvline(np.min(np.where(result==0)))
-        except:
-            pass
+        plt.errorbar(x, result, fmt='o', color='blue', capsize=3, markersize=4, label='Simulation Data', zorder=1)
         
-    plt.title(function)
+    #plt.title(function)
     plt.xscale('log')
-    plt.yscale('log')
+    plt.yscale('log')    
+    plt.ylabel(function_names[i], fontsize='14')
+    plt.xlabel(function_vars[i], fontsize='14')
+    plt.tick_params(axis='both', which='major', labelsize='14')
     plt.show()
