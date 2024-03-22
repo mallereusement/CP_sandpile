@@ -6,7 +6,7 @@
     - pertubation mechanism: non_conservative
     - boundary condition: closed
     - use absolute value: True
-    - number of activated avalanches: 20000
+    - number of activated avalanches: 50000
     - maximum time steps: 20000000
     - track avalanches after steady state: False
     - steady state: 15000
@@ -22,7 +22,7 @@
     - pertubation mechanism: non_conservative
     - boundary condition: closed
     - use absolute value: False
-    - number of activated avalanches: 20000
+    - number of activated avalanches: 50000
     - maximum time steps: 20000000
     - track avalanches after steady state: False
     - steady state: 15000
@@ -39,7 +39,7 @@
     - pertubation mechanism: non_conservative
     - boundary condition: closed
     - use absolute value: True
-    - number of activated avalanches: 20000
+    - number of activated avalanches: 50000
     - maximum time steps: 20000000
     - track avalanches after steady state: False
     - steady state: 40000
@@ -55,7 +55,7 @@
     - pertubation mechanism: non_conservative
     - boundary condition: closed
     - use absolute value: True
-    - number of activated avalanches: 20000
+    - number of activated avalanches: 50000
     - maximum time steps: 20000000
     - track avalanches after steady state: False
     - steady state: 400000
@@ -72,7 +72,7 @@
     - pertubation mechanism: non_conservative
     - boundary condition: open
     - use absolute value: True
-    - number of activated avalanches: 20000
+    - number of activated avalanches: 50000
     - maximum time steps: 20000000
     - track avalanches after steady state: False
     - steady state: 15000
@@ -88,7 +88,7 @@
     - pertubation mechanism: conservative
     - boundary condition: open
     - use absolute value: True
-    - number of activated avalanches: 20000
+    - number of activated avalanches: 50000
     - maximum time steps: 20000000
     - track avalanches after steady state: False
     - steady state: 500000
@@ -104,7 +104,7 @@
     - pertubation mechanism: conservative
     - boundary condition: closed
     - use absolute value: True
-    - number of activated avalanches: 20000
+    - number of activated avalanches: 50000
     - maximum time steps: 20000000
     - track avalanches after steady state: False
     - steady state: 500000
@@ -120,7 +120,7 @@
     - pertubation mechanism: non_conservative
     - boundary condition: closed
     - use absolute value: True
-    - number of activated avalanches: 20000
+    - number of activated avalanches: 50000
     - maximum time steps: 20000000
     - track avalanches after steady state: False
     - steady state: 15000
@@ -136,7 +136,7 @@
     - pertubation mechanism: non_conservative
     - boundary condition: closed
     - use absolute value: True
-    - number of activated avalanches: 20000
+    - number of activated avalanches: 50000
     - maximum time steps: 20000000
     - track avalanches after steady state: False
     - steady state: 15000

@@ -11,7 +11,7 @@
     - power spectrum N: 1000
     - bootstrap size: 200
     - xlabels: [s, $\tau$, l, $\tau$, s, l, s, l, $\tau$, f]
-    - ylabels: [P(S), P(T), P(L), E(S|T), E(T|S), E(S|L), E(L|S), E(T|L), E(L|T), S(f)]
+    - ylabels: [N(S), N(T), N(L), E(S|T), E(T|S), E(S|L), E(L|S), E(T|L), E(L|T), S(f)]
     - max t for z_mean: 2
     - block size: 0
 
@@ -28,7 +28,7 @@
     - power spectrum N: 1000
     - bootstrap size: 200
     - xlabels: [s, $\tau$, l, $\tau$, s, l, s, l, $\tau$, f]
-    - ylabels: [P(S), P(T), P(L), E(S|T), E(T|S), E(S|L), E(L|S), E(T|L), E(L|T), S(f)]
+    - ylabels: [N(S), N(T), N(L), E(S|T), E(T|S), E(S|L), E(L|S), E(T|L), E(L|T), S(f)]
     - max t for z_mean: 1
     - block size: 0
 
@@ -45,7 +45,7 @@
     - power spectrum N: 1000
     - bootstrap size: 200
     - xlabels: [s, $\tau$, l, $\tau$, s, l, s, l, $\tau$, f]
-    - ylabels: [P(S), P(T), P(L), E(S|T), E(T|S), E(S|L), E(L|S), E(T|L), E(L|T), S(f)]
+    - ylabels: [N(S), N(T), N(L), E(S|T), E(T|S), E(S|L), E(L|S), E(T|L), E(L|T), S(f)]
     - max t for z_mean: 12
     - block size: 0
 
@@ -62,7 +62,7 @@
     - power spectrum N: 1000
     - bootstrap size: 200
     - xlabels: [s, $\tau$, l, $\tau$, s, l, s, l, $\tau$, f]
-    - ylabels: [P(S), P(T), P(L), E(S|T), E(T|S), E(S|L), E(L|S), E(T|L), E(L|T), S(f)]
+    - ylabels: [N(S), N(T), N(L), E(S|T), E(T|S), E(S|L), E(L|S), E(T|L), E(L|T), S(f)]
     - max t for z_mean: 12
     - block size: 0
 
@@ -79,7 +79,7 @@
     - power spectrum N: 1000
     - bootstrap size: 200
     - xlabels: [s, $\tau$, l, $\tau$, s, l, s, l, $\tau$, f]
-    - ylabels: [P(S), P(T), P(L), E(S|T), E(T|S), E(S|L), E(L|S), E(T|L), E(L|T), S(f)]
+    - ylabels: [N(S), N(T), N(L), E(S|T), E(T|S), E(S|L), E(L|S), E(T|L), E(L|T), S(f)]
     - max t for z_mean: 2
     - block size: 0
 
@@ -96,7 +96,7 @@
     - power spectrum N: 1000
     - bootstrap size: 200
     - xlabels: [s, $\tau$, l, $\tau$, s, l, s, l, $\tau$, f]
-    - ylabels: [P(S), P(T), P(L), E(S|T), E(T|S), E(S|L), E(L|S), E(T|L), E(L|T), S(f)]
+    - ylabels: [N(S), N(T), N(L), E(S|T), E(T|S), E(S|L), E(L|S), E(T|L), E(L|T), S(f)]
     - max t for z_mean: 2
     - block size: 0
 
@@ -113,7 +113,7 @@
     - power spectrum N: 1000
     - bootstrap size: 200
     - xlabels: [s, $\tau$, l, $\tau$, s, l, s, l, $\tau$, f]
-    - ylabels: [P(S), P(T), P(L), E(S|T), E(T|S), E(S|L), E(L|S), E(T|L), E(L|T), S(f)]
+    - ylabels: [N(S), N(T), N(L), E(S|T), E(T|S), E(S|L), E(L|S), E(T|L), E(L|T), S(f)]
     - max t for z_mean: 2
     - block size: 0
 
@@ -130,7 +130,7 @@
     - power spectrum N: 1000
     - bootstrap size: 200
     - xlabels: [s, $\tau$, l, $\tau$, s, l, s, l, $\tau$, f]
-    - ylabels: [P(S), P(T), P(L), E(S|T), E(T|S), E(S|L), E(L|S), E(T|L), E(L|T), S(f)]
+    - ylabels: [N(S), N(T), N(L), E(S|T), E(T|S), E(S|L), E(L|S), E(T|L), E(L|T), S(f)]
     - max t for z_mean: 1
     - block size: 0
 
@@ -147,7 +147,7 @@
     - power spectrum N: 1000
     - bootstrap size: 200
     - xlabels: [s, $\tau$, l, $\tau$, s, l, s, l, $\tau$, f]
-    - ylabels: [P(S), P(T), P(L), E(S|T), E(T|S), E(S|L), E(L|S), E(T|L), E(L|T), S(f)]
+    - ylabels: [N(S), N(T), N(L), E(S|T), E(T|S), E(S|L), E(L|S), E(T|L), E(L|T), S(f)]
     - max t for z_mean: 12
     - block size: 0
 
@@ -164,7 +164,7 @@
     - power spectrum N: 1000
     - bootstrap size: 200
     - xlabels: [s, $\tau$, l, $\tau$, s, l, s, l, $\tau$, f]
-    - ylabels: [P(S), P(T), P(L), E(S|T), E(T|S), E(S|L), E(L|S), E(T|L), E(L|T), S(f)]
+    - ylabels: [N(S), N(T), N(L), E(S|T), E(T|S), E(S|L), E(L|S), E(T|L), E(L|T), S(f)]
     - max t for z_mean: 12
     - block size: 0
 
@@ -181,7 +181,7 @@
     - power spectrum N: 1000
     - bootstrap size: 200
     - xlabels: [s, $\tau$, l, $\tau$, s, l, s, l, $\tau$, f]
-    - ylabels: [P(S), P(T), P(L), E(S|T), E(T|S), E(S|L), E(L|S), E(T|L), E(L|T), S(f)]
+    - ylabels: [N(S), N(T), N(L), E(S|T), E(T|S), E(S|L), E(L|S), E(T|L), E(L|T), S(f)]
     - max t for z_mean: 2
     - block size: 0
 
@@ -198,6 +198,6 @@
     - power spectrum N: 1000
     - bootstrap size: 200
     - xlabels: [s, $\tau$, l, $\tau$, s, l, s, l, $\tau$, f]
-    - ylabels: [P(S), P(T), P(L), E(S|T), E(T|S), E(S|L), E(L|S), E(T|L), E(L|T), S(f)]
+    - ylabels: [N(S), N(T), N(L), E(S|T), E(T|S), E(S|L), E(L|S), E(T|L), E(L|T), S(f)]
     - max t for z_mean: 2
     - block size: 0

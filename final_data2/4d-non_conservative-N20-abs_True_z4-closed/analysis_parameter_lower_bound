@@ -3,17 +3,51 @@
     "name for save": "lower_bound",
     "fit functions": [
         "P_of_S",
-        "S_of_f"
-    ],
-    "end bins": [
-        20.5,
-        10.0
+        "P_of_T",
+        "P_of_L",
+        "E_of_S_T",
+        "E_of_T_S",
+        "E_of_S_L",
+        "E_of_L_S",
+        "E_of_T_L",
+        "E_of_L_T",
+        "S_of_f",
+        "gamma1_gamma3_1",
+        "gamma1_gamma3_2"
     ],
     "start bins": [
-        1.5,
-        2.0
+        20.5,
+        20.5,
+        5.5,
+        30.5,
+        20.5,
+        11.5,
+        30.5,
+        10.5,
+        20.5,
+        5.5
+    ],
+    "end bins": [
+        150.5,
+        90.5,
+        10.5,
+        80.5,
+        100.5,
+        20.5,
+        100.5,
+        20.5,
+        100.5,
+        10.5
     ],
     "bin width": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
         1,
         1
     ],
@@ -24,11 +58,27 @@
     "bootstrap size": 200,
     "xlabels": [
         "s",
-        "rg"
+        "$\\tau$",
+        "l",
+        "$\\tau$",
+        "s",
+        "l",
+        "s",
+        "l",
+        "$\\tau$",
+        "f"
     ],
     "ylabels": [
         "P(S)",
-        "gwop"
+        "P(T)",
+        "P(L)",
+        "E(S|T)",
+        "E(T|S)",
+        "E(S|L)",
+        "E(L|S)",
+        "E(T|L)",
+        "E(L|T)",
+        "S(f)"
     ],
     "max t for z_mean": 12,
     "block size": 0
