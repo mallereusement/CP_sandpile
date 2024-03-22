@@ -4,7 +4,7 @@ import pandas as pd
 import calc_exponents
 from uncertainties import unumpy as unp
 
-df = pd.read_csv('final_data2/3d-non_conservative-N20-abs_True_z4-closed/simulation_data/data_for_exponent_calculation.csv', sep=';')
+df = pd.read_csv('final_data2/2d-non_conservative-N100-abs_True_z4-closed/simulation_data/data_for_exponent_calculation.csv', sep=';')
 fit_funtion_mapping = {
     'P_of_S': ['total dissipation', '-'],
     'P_of_T': ['lifetime', '-'],
@@ -17,8 +17,8 @@ fit_funtion_mapping = {
     'E_of_L_T': ['spatial linear size', 'lifetime']
 }
 
-function_names = ['N(S=s)', 'N(T=$t_l$)', 'N(L=l)', 'E(S|T=$t_l$)', 'E(T|S=s)', 'E(S|L=l)', 'E(L|S=s)', 'E(T|L=l)', 'E(L|T=$t_l$)']
-function_vars = ['s', '$t_l', 'l', '$t_l$', 's', 'l', 's', 'l', '$t_l$', 'f']
+function_names = ['N(S=s)', 'N(T=$t_l$)', 'N(L=l)', 'E(S|T=$t_l$)', 'E(T|S=s)', 'E(S|L=l)', 'E(L|S=s)', 'E(T|L=l)', 'E(L|T=$t_l$)', 'S(f)']
+function_vars = ['s', '$t_l$', 'l', '$t_l$', 's', 'l', 's', 'l', '$t_l$', 'f']
 
 #time = df['time'].to_numpy()
 #mean = df['mean'].to_numpy()
@@ -46,4 +46,6 @@ for i, function in enumerate(fit_funtion_mapping):
     plt.ylabel(function_names[i], fontsize='14')
     plt.xlabel(function_vars[i], fontsize='14')
     plt.tick_params(axis='both', which='major', labelsize='14')
-    plt.show()
+    plt.savefig(f'{function}.jpg', dpi=300)
+    plt. clf()
+    #plt.show()

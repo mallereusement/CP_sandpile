@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from statsmodels.graphics import tsaplots
 
-
+plt.rcParams.update({'font.size': 16})
 path_to_file = 'data_for_exponent_calculation.csv'
 
 df = pd.read_csv(path_to_file, sep=';', encoding='utf8')
@@ -15,4 +15,5 @@ plt.ylim(-0.1, 1.1)
 plt.ylabel('Normalized ACF')
 plt.xlabel('time')
 plt.title('')
+plt.tight_layout()
 plt.savefig('acf.png', dpi=300)

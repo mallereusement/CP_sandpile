@@ -42,6 +42,9 @@ t = np.array([1.50664831, 1.50423699, 1.49870545, 1.49623603, 1.49868256, 1.4989
 
 
 #create Q-Q plot with 45-degree line added to plot
+plt.rcParams.update({'font.size': 16})
 t = (t - np.mean(t)) / np.std(t)
 fig = sm.qqplot(t, line='45')
+plt.tight_layout()
+plt.savefig('qq_plot.png', dpi=300)
 plt.show()
