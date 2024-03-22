@@ -252,13 +252,14 @@ def plot_heatmap(crit_grid_sum, type, boundary_condition):
 
 
 
-def run_simulation(simulation_parameter: dict, filepath_datastorage: str, simulation_name: str):
+def run_simulation(simulation_parameter: dict, filepath_datastorage: str, simulation_name: str, safe_data_for_animations: bool=False):
     """Runs a sandpile simulation based on the provided parameters.
 
     Args:
         simulation_parameter (dict): Dictionary containing simulation parameters.
         filepath_datastorage (str): Path to the directory where simulation data will be stored.
         simulation_name (str): Name of the simulation.
+        safe_data_for_animations (bool): safe data for animations (Default to False)
 
     Returns:
         None
@@ -317,7 +318,18 @@ def run_simulation(simulation_parameter: dict, filepath_datastorage: str, simula
     t = 0 # Initialize time tracker
     count_avalanches = 0 # Track number of triggered avalanches
 
+    if safe_data_for_animations: # Only to create animations
+        if simulation_parameter['save animation of evolution to steady state']:
+            evo_to_steady_state = []
+    if safe_data_for_animations: # Only to create animations
+        if simulation_parameter['save animation of avalanches']:
+            ani_counter = 0
+            ava_tracker = []
+
     while (count_avalanches < maximum_avalanches) and (t < max_t): # Run simulation until maximum time steps or maximum avalanches are reached
+
+
+
         if c < 2:
             if track_after_steady_state:
                 if t > steady_state:
@@ -331,6 +343,17 @@ def run_simulation(simulation_parameter: dict, filepath_datastorage: str, simula
         grid_pertubation_tracker[tuple(random_point)] +=1 # Track point of pertubation
         
         grid = pertubation_mech(grid, N, type=pertubation_mechanism, p=random_point, d=d, boundary_condition = boundary_condition) # Apply pertubation
+
+
+        # Only to create animations #####
+        if safe_data_for_animations:
+            if simulation_parameter['save animation of evolution to steady state']:
+                evo_to_steady_state.append(grid.copy())
+                if reached_steady_state:
+                    evo_to_steady_state = np.array(evo_to_steady_state)
+                    np.save(f'{filepath_datastorage}/{simulation_name}/evo_to_steady_state.npy', evo_to_steady_state)
+                    break
+        #################################
         
         if use_abs_value: # Check either if there are points with z > critical value or |z| > critical value, depends on chooses simulation parameter
             z = abs(grid) > crit_val
@@ -369,7 +392,30 @@ def run_simulation(simulation_parameter: dict, filepath_datastorage: str, simula
             if simulation_parameter['save mean value of grid']:
                 means['mean'].append(np.mean(grid))
                 means['time'].append(t)
-            
+
+            # Only to create animations #####
+            if safe_data_for_animations:
+                if simulation_parameter['save animation of avalanches']:
+                    ava_tracker.append(crit_grid.copy())
+            ##################################
+
+        # Only to create animations #####
+        if safe_data_for_animations: 
+            if simulation_parameter['save animation of avalanches']:
+                if simulation_parameter['save multiple avalanches']:
+                    if t > simulation_parameter['minimum time of avalanche']:
+                        ava_tracker = np.array(ava_tracker)
+                        np.save(f'{filepath_datastorage}/{simulation_name}/ava_tracker.npy', ava_tracker)
+                        break
+                else:
+                    if (t - t_pre) > simulation_parameter['minimum time of avalanche']:
+                        ava_tracker = np.array(ava_tracker)
+                        np.save(f'{filepath_datastorage}/{simulation_name}/ava_tracker.npy', ava_tracker)
+                        break
+                    else:
+                        ava_tracker = []
+        ###################################
+                               
         t_post = t 
 
         grid_dissipation_tracker += crit_grid
@@ -413,17 +459,18 @@ def run_simulation(simulation_parameter: dict, filepath_datastorage: str, simula
     pbar1.close()
 
     #### Save Data ####
-    if simulation_parameter['save file for exponent calculation']:
-        write_data_for_exponent_calculation_to_file(f'{filepath_datastorage}/{simulation_name}/simulation_data', 'data_for_exponent_calculation', exp_data)
+    if not safe_data_for_animations:
+        if simulation_parameter['save file for exponent calculation']:
+            write_data_for_exponent_calculation_to_file(f'{filepath_datastorage}/{simulation_name}/simulation_data', 'data_for_exponent_calculation', exp_data)
 
-    if simulation_parameter['save file for power spectrum calculation']:
-        write_data_for_power_spectrum_to_file(f'{filepath_datastorage}/{simulation_name}/simulation_data', 'data_for_power_spectrum_calculation', list_avalanches)
+        if simulation_parameter['save file for power spectrum calculation']:
+            write_data_for_power_spectrum_to_file(f'{filepath_datastorage}/{simulation_name}/simulation_data', 'data_for_power_spectrum_calculation', list_avalanches)
 
-    if simulation_parameter['save mean value of grid']:
-        write_data_for_exponent_calculation_to_file(f'{filepath_datastorage}/{simulation_name}/simulation_data', 'data_mean', means)
-        
-    
-    if d == 2:
-        ## plot perturbations in the grid
-        plot_heatmap(grid_dissipation_tracker, pertubation_mechanism, boundary_condition)
-        plt.savefig(f'{filepath_datastorage}/plots/{simulation_name}/heatmap_dissipation_{simulation_name}.jpg')
+        if simulation_parameter['save mean value of grid']:
+            write_data_for_exponent_calculation_to_file(f'{filepath_datastorage}/{simulation_name}/simulation_data', 'data_mean', means)
+            
+    if not safe_data_for_animations:
+        if d == 2:
+            ## plot perturbations in the grid
+            plot_heatmap(grid_dissipation_tracker, pertubation_mechanism, boundary_condition)
+            plt.savefig(f'{filepath_datastorage}/plots/{simulation_name}/heatmap_dissipation_{simulation_name}.jpg')
