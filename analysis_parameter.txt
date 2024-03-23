@@ -2,7 +2,7 @@
     - name: 2d-non_conservative-N100-abs_True_z4-closed
     - name for save: ana2
     - fit functions: [P_of_S, P_of_T, P_of_L, E_of_S_T, E_of_T_S, E_of_S_L, E_of_L_S, E_of_T_L, E_of_L_T, S_of_f, gamma1_gamma3_1, gamma1_gamma3_2]
-    - start bins: [1.5, 1.5, 1.5, 3.5, 4.5, 4.5, 6.5, 3.5, 5.5, 5.5]
+    - start bins: [1.5, 3.5, 1.5, 6.5, 7.5, 7.5, 6.5, 7.5, 7.5, 5.5]
     - end bins: [300.5, 300.5, 50.5, 250.5, 250.5, 70.5, 100.5, 70.5, 200.5, 10.5]
     - bin width: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
     - save plots: True
@@ -19,7 +19,7 @@
     - name: 3d-non_conservative-N20-abs_True_z4-closed
     - name for save: ana2
     - fit functions: [P_of_S, P_of_T, P_of_L, E_of_S_T, E_of_T_S, E_of_S_L, E_of_L_S, E_of_T_L, E_of_L_T, S_of_f, gamma1_gamma3_1, gamma1_gamma3_2]
-    - start bins: [1.5, 1.5, 2.5, 8.5, 2.5, 4.5, 8.5, 3.5, 4.5, 5]
+    - start bins: [3.5, 3.5, 2.5, 8.5, 4.5, 4.5, 8.5, 3.5, 5.5, 5]
     - end bins: [170.5, 30.5, 10.5, 80.5, 200.5, 16.5, 200.5, 17.5, 60.5, 10]
     - bin width: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
     - save plots: True
@@ -36,7 +36,7 @@
     - name: 4d-non_conservative-N20-abs_True_z4-closed
     - name for save: ana2
     - fit functions: [P_of_S, P_of_T, P_of_L, E_of_S_T, E_of_T_S, E_of_S_L, E_of_L_S, E_of_T_L, E_of_L_T, S_of_f, gamma1_gamma3_1, gamma1_gamma3_2]
-    - start bins: [1.5, 2.5, 1.5, 10.5, 2.5, 6.5, 10.5, 5.5, 6.5, 5.5]
+    - start bins: [3.5, 5.5, 1.5, 10.5, 4.5, 6.5, 10.5, 5.5, 9.5, 5.5]
     - end bins: [150.5, 90.5, 10.5, 80.5, 100.5, 20.5, 100.5, 20.5, 100.5, 10.5]
     - bin width: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
     - save plots: True
@@ -53,7 +53,7 @@
     - name: 2d-non_conservative-N100-abs_False_z4-closed
     - name for save: ana2
     - fit functions: [P_of_S, P_of_T, P_of_L, E_of_S_T, E_of_T_S, E_of_S_L, E_of_L_S, E_of_T_L, E_of_L_T, S_of_f, gamma1_gamma3_1, gamma1_gamma3_2]
-    - start bins: [1.5, 1.5, 1.5, 3.5, 4.5, 4.5, 6.5, 3.5, 5.5, 5.5]
+    - start bins: [1.5, 3.5, 1.5, 6.5, 7.5, 7.5, 6.5, 7.5, 7.5, 5.5]
     - end bins: [300.5, 300.5, 50.5, 250.5, 250.5, 70.5, 100.5, 70.5, 200.5, 10.5]
     - bin width: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
     - save plots: True
@@ -70,7 +70,7 @@
     - name: 2d-non_conservative-N100-abs_True_z3-closed
     - name for save: ana2
     - fit functions: [P_of_S, P_of_T, P_of_L, E_of_S_T, E_of_T_S, E_of_S_L, E_of_L_S, E_of_T_L, E_of_L_T, S_of_f, gamma1_gamma3_1, gamma1_gamma3_2]
-    - start bins: [1.5, 1.5, 1.5, 3.5, 4.5, 4.5, 6.5, 3.5, 5.5, 5.5]
+    - start bins: [1.5, 3.5, 1.5, 6.5, 7.5, 7.5, 6.5, 7.5, 7.5, 5.5]
     - end bins: [300.5, 300.5, 50.5, 250.5, 250.5, 70.5, 100.5, 70.5, 200.5, 10.5]
     - bin width: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
     - save plots: True
@@ -87,7 +87,7 @@
     - name: 2d-non_conservative-N40-abs_True_z4-closed
     - name for save: ana2
     - fit functions: [P_of_S, P_of_T, P_of_L, E_of_S_T, E_of_T_S, E_of_S_L, E_of_L_S, E_of_T_L, E_of_L_T, S_of_f, gamma1_gamma3_1, gamma1_gamma3_2]
-    - start bins: [1.5, 1.5, 1.5, 10.5, 2.5, 8.5, 11.5, 5.5, 10.5, 5.5]
+    - start bins: [1.5, 4.5, 1.5, 10.5, 6.5, 8.5, 13.5, 5.5, 10.5, 5.5]
     - end bins: [300.5, 80.5, 25.5, 150.5, 300.5, 30.5, 150.5, 30.5, 70.5, 10.5]
     - bin width: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
     - save plots: True
