@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 from uncertainties import unumpy as unp
 from tqdm import tqdm
 import math
+from scipy.stats import chi2
 
 
 fit_functions = static_definitions.exponent_functions()
@@ -207,8 +208,9 @@ def get_exponent_product_from_simulation_data_conditional_exp_value(fit_function
     org_product = m_org1.values['exponent'] * m_org2.values['exponent']
     # Calculate uncertainties
     std = np.std(product)
-    
-    return {"chi_square1": m_org1.fval, "degrees_of_freedom1": m_org1.ndof, "chi_square2": m_org2.fval, "degrees_of_freedom2": m_org2.ndof, "product": unc.ufloat(org_product, std), "products_from_bootstrap": product, "samples": samples, "number_of_valid_fits": valid_counter}
+
+            
+    return {"chi_square1": m_org1.fval, "degrees_of_freedom1": m_org1.ndof, "chi_square_ndof1": m_org1.fval/m_org1.ndof, "chi_square2": m_org2.fval, "degrees_of_freedom2": m_org2.ndof, "chi_square_ndof2": m_org2.fval/m_org2.ndof, "product": unc.ufloat(org_product, std), "products_from_bootstrap": product, "samples": samples, "number_of_valid_fits": valid_counter}
 
 
 
@@ -255,8 +257,8 @@ def get_exponent_from_simulation_data_conditional_exp_value(fit_function: str, b
     parameters_exp = np.array(parameters_exp)
     # Calculate covariance matrix
     cov_mat = np.cov(np.stack((parameters_amp, parameters_exp), axis = 0))
-    
-    return {"chi_square": m_org.fval, "degrees_of_freedom": m_org.ndof, "exponent_values_from_bootrstrap": parameters_exp, "parameters": [unc.ufloat(m_org.values['amp'], cov_mat[0,0]**0.5), unc.ufloat(m_org.values['exponent'], cov_mat[1,1]**0.5)], "covariance_matrix": cov_mat, "x": x, "data": unp.nominal_values(data_org), "errors": unp.std_devs(data_org), "model": fit_functions[fit_function](x, m_org.values['amp'], m_org.values['exponent']), "samples": samples}
+
+    return {"chi_square": m_org.fval, "degrees_of_freedom": m_org.ndof, "chi_square_ndof": m_org.fval/m_org.ndof, "exponent_values_from_bootrstrap": parameters_exp, "parameters": [unc.ufloat(m_org.values['amp'], cov_mat[0,0]**0.5), unc.ufloat(m_org.values['exponent'], cov_mat[1,1]**0.5)], "covariance_matrix": cov_mat, "x": x, "data": unp.nominal_values(data_org), "errors": unp.std_devs(data_org), "model": fit_functions[fit_function](x, m_org.values['amp'], m_org.values['exponent']), "samples": samples}
 
 
 def generate_following_indices(indices: list, n: int) -> list:
@@ -363,7 +365,7 @@ def get_exponent_from_simulation_data(fit_function: str, bins: np.ndarray, df: p
     # Calculate covariance matrix
     cov_mat = np.cov(np.stack((parameters_amp, parameters_exp), axis = 0))
 
-    return {"chi_square": m_org.fval, "degrees_of_freedom": m_org.ndof, "exponent_values_from_bootrstrap": parameters_exp, "parameters": [unc.ufloat(m_org.values['amp'], cov_mat[0,0]**0.5), unc.ufloat(m_org.values['exponent'], cov_mat[1,1]**0.5)], "covariance_matrix": cov_mat, "x": bin_centers, "data": data, "errors": errors, "model": fit_functions[fit_function](bin_centers, m_org.values['amp'], m_org.values['exponent']), "samples": samples}
+    return {"chi_square": m_org.fval, "degrees_of_freedom": m_org.ndof, "chi_square_ndof": m_org.fval/m_org.ndof, "exponent_values_from_bootrstrap": parameters_exp, "parameters": [unc.ufloat(m_org.values['amp'], cov_mat[0,0]**0.5), unc.ufloat(m_org.values['exponent'], cov_mat[1,1]**0.5)], "covariance_matrix": cov_mat, "x": bin_centers, "data": data, "errors": errors, "model": fit_functions[fit_function](bin_centers, m_org.values['amp'], m_org.values['exponent']), "samples": samples}
 
 
 def fit_data(fit_function: str, x: np.ndarray, data: np.ndarray, errors: np.ndarray, starting_values: list) -> float:
@@ -407,7 +409,7 @@ def save_exponent_data(fit_function: str, bins: dict, bootstrap_size: str, fit_r
     if bins2 == False:
         bins = get_bins_from_parameter_settings(*bins)
         # Create DataFrame with fit results
-        temp_df = pd.DataFrame({'chi_square': [fit_results['chi_square']], 'degrees_of_freedom': [fit_results['degrees_of_freedom']], 'fit function': [fit_function], 'variable': [fit_funtion_mapping[fit_function][0]], 'condition': [fit_funtion_mapping[fit_function][1]], 'left bin edge': [bins[0]], 'right bin edge': [bins[-1]], 'count of bins': [len(bins)-1], 'bootstrap size': [bootstrap_size], 'amplitude from fit result': [fit_results['parameters'][0]], 'exponent from fit result': [fit_results['parameters'][1]], 'covariance c_11': [fit_results['covariance_matrix'][0,0]], 'covariance c_12': [fit_results['covariance_matrix'][0,1]], 'covariance c_22': [fit_results['covariance_matrix'][1,1]]})
+        temp_df = pd.DataFrame({'chi_square': [fit_results['chi_square']], 'degrees_of_freedom': [fit_results['degrees_of_freedom']], 'chi_square_ndof': [fit_results['chi_square_ndof']], 'fit function': [fit_function], 'variable': [fit_funtion_mapping[fit_function][0]], 'condition': [fit_funtion_mapping[fit_function][1]], 'left bin edge': [bins[0]], 'right bin edge': [bins[-1]], 'count of bins': [len(bins)-1], 'bootstrap size': [bootstrap_size], 'amplitude from fit result': [fit_results['parameters'][0]], 'exponent from fit result': [fit_results['parameters'][1]], 'covariance c_11': [fit_results['covariance_matrix'][0,0]], 'covariance c_12': [fit_results['covariance_matrix'][0,1]], 'covariance c_22': [fit_results['covariance_matrix'][1,1]]})
         
         if not file_to_load:
             temp_df.to_csv(file_to_save, sep=';', encoding='utf8', index=False)
@@ -419,7 +421,7 @@ def save_exponent_data(fit_function: str, bins: dict, bootstrap_size: str, fit_r
         bins = get_bins_from_parameter_settings(*bins)
         bins2 = get_bins_from_parameter_settings(*bins2)
         # Create DataFrame with fit results
-        temp_df = pd.DataFrame({'chi_square1': [fit_results['chi_square1']], 'degrees_of_freedom1': [fit_results['degrees_of_freedom1']], 'chi_square2': [fit_results['chi_square2']], 'degrees_of_freedom2': [fit_results['degrees_of_freedom2']], 'fit function': [fit_function], 'left bin edge 1': [bins[0]], 'right bin edge 1': [bins[-1]], 'count of bins 1': [len(bins)-1], 'left bin edge 2': [bins2[0]], 'right bin edge 2': [bins2[-1]], 'count of bins 2': [len(bins2)-1], 'bootstrap size': [bootstrap_size], 'product from fit result': [fit_results['product']], 'number of valid fits': [fit_results['number_of_valid_fits']]})
+        temp_df = pd.DataFrame({'chi_square1': [fit_results['chi_square1']], 'degrees_of_freedom1': [fit_results['degrees_of_freedom1']], 'chi_square_ndof1': [fit_results['chi_square_ndof1']], 'chi_square2': [fit_results['chi_square2']], 'degrees_of_freedom2': [fit_results['degrees_of_freedom2']], 'chi_square_ndof2': [fit_results['chi_square_ndof2']], 'fit function': [fit_function], 'left bin edge 1': [bins[0]], 'right bin edge 1': [bins[-1]], 'count of bins 1': [len(bins)-1], 'left bin edge 2': [bins2[0]], 'right bin edge 2': [bins2[-1]], 'count of bins 2': [len(bins2)-1], 'bootstrap size': [bootstrap_size], 'product from fit result': [fit_results['product']], 'number of valid fits': [fit_results['number_of_valid_fits']]})
         
         # Check if data should be appended to an existing file or saved to a new file
         if not file_to_load:
