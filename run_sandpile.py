@@ -63,16 +63,30 @@ if __name__ == '__main__':
     # Reading simulation parameters from file
     simulation_parameters = read_simulation_parameters(file_path, format_int, format_bool)
     # Creating directories for storing simulation data and plots
-    os.mkdir('./' + args.path)
-    os.mkdir('./' + args.path + f'/plots')
+    try:
+        os.mkdir('./' + args.path)
+    except:
+        pass
+    try:
+        os.mkdir('./' + args.path + f'/plots')
+    except:
+        pass
 
     # Iterating over simulation parameters
     for parameter in simulation_parameters:
        
-        os.mkdir('./' + args.path + f'/{simulation_parameters[parameter]["name"]}')   ## create path for specific simulation
-        os.mkdir('./' + args.path + f'/{simulation_parameters[parameter]["name"]}/simulation_data')  ## create folder to store simulation data in
-        
-        os.mkdir('./' + args.path + f'/plots/{simulation_parameters[parameter]["name"]}')  ## create folder for the specific simulation
+        try:
+            os.mkdir('./' + args.path + f'/{simulation_parameters[parameter]["name"]}')   ## create path for specific simulation
+        except:
+            pass
+        try:    
+            os.mkdir('./' + args.path + f'/{simulation_parameters[parameter]["name"]}/simulation_data')  ## create folder to store simulation data in
+        except:
+            pass
+        try:
+            os.mkdir('./' + args.path + f'/plots/{simulation_parameters[parameter]["name"]}')  ## create folder for the specific simulation
+        except:
+            pass
         # Saving simulation parameters to a JSON file
         save_simulation_parameters('./' + args.path + f'/{simulation_parameters[parameter]["name"]}/simulation_data/simulation_parameter', simulation_parameters[parameter])
         # Running simulation based on the parameters

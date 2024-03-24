@@ -1,8 +1,8 @@
-- setting01
-    - name: 2d-non_conservative-N100-abs_True_z4-closed
+- setting08
+    - name: 2d-non_conservative-N100-abs_True_z3-closed
     - dimension:   2
     - size of grid: 100
-    - crititcal value of z: 4
+    - crititcal value of z: 3
     - pertubation mechanism: non_conservative
     - boundary condition: closed
     - use absolute value: True
@@ -10,22 +10,6 @@
     - maximum time steps: 20000000
     - track avalanches after steady state: False
     - steady state: 50000
-    - save file for power spectrum calculation: True
-    - save file for exponent calculation: True
-    - save mean value of grid: True
-
-- setting06
-    - name: 2d-conservative-N100-abs_True_z4-open
-    - dimension:   2
-    - size of grid: 100
-    - crititcal value of z: 4
-    - pertubation mechanism: conservative
-    - boundary condition: open
-    - use absolute value: True
-    - number of activated avalanches: 50000
-    - maximum time steps: 20000000
-    - track avalanches after steady state: False
-    - steady state: 500000
     - save file for power spectrum calculation: True
     - save file for exponent calculation: True
     - save mean value of grid: True
