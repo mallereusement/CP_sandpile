@@ -25,7 +25,7 @@
     - number of activated avalanches: 50000
     - maximum time steps: 20000000
     - track avalanches after steady state: False
-    - steady state: 15000
+    - steady state: 50000
     - save file for power spectrum calculation: True
     - save file for exponent calculation: True
     - save mean value of grid: True
@@ -75,7 +75,7 @@
     - number of activated avalanches: 50000
     - maximum time steps: 20000000
     - track avalanches after steady state: False
-    - steady state: 15000
+    - steady state: 50000
     - save file for power spectrum calculation: True
     - save file for exponent calculation: True
     - save mean value of grid: True

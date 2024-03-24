@@ -3,11 +3,15 @@ import pandas as pd
 import run_analysis as ra
 import matplotlib.pyplot as plt
 
+
+file_path = 'analysis_parameter.txt'
+file_path_sim_data = 'final_data'
+
 def calculate_uncertainties(up_list, low_list, results):
     unc_up = up_list - results
     unc_lo = results - low_list
     
-    ## set all invalid uncertainties 0
+    ## set all invalid uncertainties 0.1
     unc_up[np.where(unc_up < 0)] = 0.1
     unc_lo[np.where(unc_lo < 0)] = 0.1
     
@@ -16,8 +20,6 @@ def calculate_uncertainties(up_list, low_list, results):
 def calculate_tot_uncertainties(unc1, unc2):
     return np.sqrt(unc1**2 + unc2**2)
 
-
-file_path = 'analysis_parameter.txt'
 
 ## set up figure for plot
 plot, (ax1, ax2, ax3) = plt.subplots(3,1, figsize=(9,6), sharex=True)
@@ -39,15 +41,15 @@ i2d = 1
 for i, parameter in enumerate(analysis_parameters):
     name = analysis_parameters[parameter]['name']
     
-    upper_bound = pd.read_csv(f'final_data2/results/{name}/upper_bound/results.csv', sep=';')['exponent from fit result'].apply(lambda x: float(x.split('+/-')[0])).to_numpy()
-    lower_bound = pd.read_csv(f'final_data2/results/{name}/lower_bound/results.csv', sep=';')['exponent from fit result'].apply(lambda x: float(x.split('+/-')[0])).to_numpy()
-    result_df = pd.read_csv(f'final_data2/results/{name}/ana2/results.csv', sep=';')
+    upper_bound = pd.read_csv(f'{file_path_sim_data}/results/{name}/upper_bound/results.csv', sep=';')['exponent from fit result'].apply(lambda x: float(x.split('+/-')[0])).to_numpy()
+    lower_bound = pd.read_csv(f'{file_path_sim_data}/results/{name}/lower_bound/results.csv', sep=';')['exponent from fit result'].apply(lambda x: float(x.split('+/-')[0])).to_numpy()
+    result_df = pd.read_csv(f'{file_path_sim_data}/results/{name}/main/results.csv', sep=';')
     result = result_df['exponent from fit result'].apply(lambda x: float(x.split('+/-')[0])).to_numpy()
     result_err = result_df['exponent from fit result'].apply(lambda x: float(x.split('+/-')[1])).to_numpy()
     
-    upper_bound_prod = pd.read_csv(f'final_data2/results/{name}/upper_bound/results_products.csv', sep=';')['product from fit result'].apply(lambda x: float(x.split('+/-')[0])).to_numpy()
-    lower_bound_prod = pd.read_csv(f'final_data2/results/{name}/lower_bound/results_products.csv', sep=';')['product from fit result'].apply(lambda x: float(x.split('+/-')[0])).to_numpy()
-    result_prod_df = pd.read_csv(f'final_data2/results/{name}/ana2/results_products.csv', sep=';')
+    upper_bound_prod = pd.read_csv(f'{file_path_sim_data}/results/{name}/upper_bound/results_products.csv', sep=';')['product from fit result'].apply(lambda x: float(x.split('+/-')[0])).to_numpy()
+    lower_bound_prod = pd.read_csv(f'{file_path_sim_data}/results/{name}/lower_bound/results_products.csv', sep=';')['product from fit result'].apply(lambda x: float(x.split('+/-')[0])).to_numpy()
+    result_prod_df = pd.read_csv(f'{file_path_sim_data}/results/{name}/main/results_products.csv', sep=';')
     result_prod = result_prod_df['product from fit result'].apply(lambda x: float(x.split('+/-')[0])).to_numpy()
     result_prod_err = result_prod_df['product from fit result'].apply(lambda x: float(x.split('+/-')[1])).to_numpy()
     
@@ -75,7 +77,7 @@ for i, parameter in enumerate(analysis_parameters):
     df['unc_lo'] = unc_lo_arr
     
     ## save df to csv-file
-    df.to_csv(f'final_data2/results/{name}/sys_uncertainties.csv', sep=',')
+    df.to_csv(f'{file_path_sim_data}/results/{name}/sys_uncertainties.csv', sep=',')
     
     N = 100
     if 'N40' in name:

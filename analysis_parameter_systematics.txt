@@ -138,8 +138,8 @@
     - name: 4d-non_conservative-N20-abs_True_z4-closed
     - name for save: lower_bound
     - fit functions: [P_of_S, P_of_T, P_of_L, E_of_S_T, E_of_T_S, E_of_S_L, E_of_L_S, E_of_T_L, E_of_L_T, S_of_f, gamma1_gamma3_1, gamma1_gamma3_2]
-    - end bins: [20.5, 20.5, 5.5, 30.5, 20.5, 11.5, 30.5, 10.5, 20.5, 5.5]
-    - start bins: [1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5]
+    - end bins: [25.5, 20.5, 10.5, 30.5, 20.5, 20.5, 40.5, 20.5, 30.5, 5.5]
+    - start bins: [5.5, 1.5, 1.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 1.5]
     - bin width: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
     - save plots: True
     - power spectrum R: 10
